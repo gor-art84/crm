@@ -1,7 +1,50 @@
-node_modules/
-dist/
+
 .next/
-.env
 .turbo
 coverage/
 .idea/
+.DS_Store
+
+
+# Nestjs specific
+/dist
+/node_modules
+/build
+/tmp
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# dotenv environment variable files
+.env
+.env.development
+.env.test
+.env.production
+
+# temp directory
+.temp
+.tmp
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
