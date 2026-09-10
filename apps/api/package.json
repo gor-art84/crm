@@ -15,7 +15,8 @@
     "start:prod": "node dist/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:format": "prisma format"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
