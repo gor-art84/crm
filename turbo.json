@@ -11,6 +11,10 @@
     },
     "prisma:format": {
       "cache": false
+    },
+    "prisma:seed": {
+      "cache": false,
+      "env": ["DATABASE_URL", "ADMIN_EMAIL", "ADMIN_PASSWORD"]
     }
   }
 }
