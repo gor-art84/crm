@@ -1,19 +1,24 @@
+# dependencies
+node_modules/
 
+# builds / caches
+dist/
+build/
+out/
+.tmp/
+.temp/
+tmp/
 .next/
-.turbo
+.turbo/
 coverage/
-.idea/
-.DS_Store
 
+# env (never commit secrets)
+.env
+.env.*
+!.env.example
 
-# Nestjs specific
-/dist
-/node_modules
-/build
-/tmp
-
-# Logs
-logs
+# logs
+logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -21,30 +26,11 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# dotenv environment variable files
-.env
-.env.development
-.env.test
-.env.production
-
-# temp directory
-.temp
-.tmp
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-
-# local env files
-.env*.local
-
-# vercel
+# IDE / OS
+.idea/
+.DS_Store
 .vercel
 
-# typescript
+# typescript / next generated
 *.tsbuildinfo
 next-env.d.ts
