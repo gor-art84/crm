@@ -7,7 +7,8 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "check": "biome check .",
-    "check:fix": "biome check --write ."
+    "check:fix": "biome check --write .",
+    "prisma:format": "turbo run prisma:format"
   },
   "keywords": [],
   "author": "",
