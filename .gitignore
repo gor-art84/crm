@@ -1,7 +1,36 @@
+# dependencies
 node_modules/
+
+# builds / caches
 dist/
+build/
+out/
+.tmp/
+.temp/
+tmp/
 .next/
-.env
-.turbo
+.turbo/
 coverage/
+
+# env (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# IDE / OS
 .idea/
+.DS_Store
+.vercel
+
+# typescript / next generated
+*.tsbuildinfo
+next-env.d.ts
