@@ -1,6 +1,7 @@
 packages:
   - apps/*
 allowBuilds:
+  '@apollo/protobufjs': true
   '@prisma/engines': true
   argon2: true
   esbuild: true

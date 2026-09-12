@@ -8,8 +8,7 @@
     "build": "turbo build",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "prisma:format": "turbo run prisma:format",
-    "prisma:seed": "turbo run prisma:seed"
+    "prisma:format": "turbo run prisma:format"
   },
   "keywords": [],
   "author": "",
