@@ -5,14 +5,23 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "codegen": "graphql-codegen",
+    "codegen:watch": "graphql-codegen --watch"
   },
   "dependencies": {
+    "@apollo/client": "^4.3.0",
+    "@apollo/client-integration-nextjs": "^0.14.5",
+    "@graphql-typed-document-node/core": "3.2.0",
+    "graphql": "^16.14.2",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^7.4.1",
+    "@graphql-codegen/client-preset": "^6.2.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

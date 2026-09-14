@@ -8,6 +8,18 @@
     "dev": {
       "persistent": true,
       "cache": false
-    }
+    },
+    "prisma:format": {
+      "cache": false
+    },
+    "prisma:generate": {},
+    "prisma:migrate": {},
+    "prisma:studio": {},
+    "prisma:seed": {
+      "cache": false,
+      "env": ["DATABASE_URL", "ADMIN_EMAIL", "ADMIN_PASSWORD"]
+    },
+    "codegen": {},
+    "codegen:watch": {}
   }
 }
