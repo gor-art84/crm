@@ -1,6 +1,6 @@
 import { gql } from "@/generated";
 
-export const hello = gql(`
+export const GET_HELLO = gql(`
     query Hello {
         hello
     }
