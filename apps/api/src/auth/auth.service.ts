@@ -61,10 +61,11 @@ export class AuthService {
     };
   }
 
-  async logout(sessionId: string | undefined): Promise<void> {
+  async logout(sessionId: string | undefined): Promise<boolean | undefined> {
     if (!sessionId) {
       return;
     }
     await this.redisService.del(sessionKey(sessionId));
+    return true;
   }
 }
