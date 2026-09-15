@@ -6,6 +6,7 @@
     "source.organizeImports.biome": "explicit",
     "source.fixAll.biome": "explicit"
   },
+  
   "prettier.enable": false,
   "eslint.enable": false,
   "biome.requireConfiguration": true,
