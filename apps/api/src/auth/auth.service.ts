@@ -60,4 +60,11 @@ export class AuthService {
       sessionId,
     };
   }
+
+  async logout(sessionId: string | undefined): Promise<void> {
+    if (!sessionId) {
+      return;
+    }
+    await this.redisService.del(sessionKey(sessionId));
+  }
 }

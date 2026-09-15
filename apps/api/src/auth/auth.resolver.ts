@@ -6,6 +6,7 @@ import { AuthPayload } from "./dto/auth.payload.js";
 import { LoginInput } from "./dto/login.input.dto.js";
 import { type GqlContext } from "./gql-context.js";
 import { GqlAuthGuard } from "./guards/gql-auth.guard.js";
+import { sessionCookieOptions } from "./session.js";
 
 @Resolver()
 export class AuthResolver {
@@ -23,10 +24,7 @@ export class AuthResolver {
     }
     const { payload, sessionId } = await this.authService.login(input);
     context.res.cookie(cookieName, sessionId, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      ...sessionCookieOptions(process.env.NODE_ENV === "production"),
       maxAge: maxAgeSec * 1000,
     });
     return payload;
@@ -36,5 +34,17 @@ export class AuthResolver {
   @Query(() => AuthPayload)
   me(@Context() context: GqlContext) {
     return context.req.user;
+  }
+
+  @Mutation(() => Boolean)
+  async logout(@Context() context: GqlContext): Promise<boolean> {
+    const cookieName = this.configService.getOrThrow<string>("COOKIE_NAME");
+    const sessionId = context.req.cookies?.[cookieName] as string | undefined;
+    await this.authService.logout(sessionId);
+    context.res.clearCookie(
+      cookieName,
+      sessionCookieOptions(process.env.NODE_ENV === "production"),
+    );
+    return true;
   }
 }
