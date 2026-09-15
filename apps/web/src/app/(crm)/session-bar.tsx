@@ -28,7 +28,7 @@ export function SessionBar() {
 
   return (
     <div>
-      <p>{data.me.email ?? `Logged in as ${data.me.email}`}</p>
+      <p>{`Logged in as ${data.me.email}`}</p>
       <button type="button" onClick={onLogout} disabled={loading}>
         Logout
       </button>
