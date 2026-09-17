@@ -14,6 +14,7 @@ export function SessionBar() {
       await logout();
     } finally {
       client.cache.evict({ id: "ROOT_QUERY", fieldName: "me" });
+      client.cache.evict({ id: "ROOT_QUERY", fieldName: "users" });
       client.cache.gc();
     }
   };

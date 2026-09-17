@@ -18,12 +18,14 @@ type Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        email\n        role\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": typeof types.GetUsersDocument,
 };
 const documents: Documents = {
     "\n    query Hello {\n        hello\n    }\n": types.HelloDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        email\n        role\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": types.MeDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": types.GetUsersDocument,
 };
 
 /**
@@ -56,6 +58,10 @@ export function gql(source: "\n  mutation Logout {\n    logout\n  }\n"): (typeof
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

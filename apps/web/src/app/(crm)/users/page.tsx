@@ -1,3 +1,5 @@
+import { UsersList } from "./users-list";
+
 export default function UsersPage() {
-  return <div>Users</div>;
+  return <UsersList />;
 }

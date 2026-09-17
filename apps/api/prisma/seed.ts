@@ -19,11 +19,16 @@ async function main() {
   const passwordHash = await argon2.hash(env("ADMIN_PASSWORD"));
   const admin = await prisma.user.upsert({
     where: { email: email },
-    update: {},
+    update: {
+      lastName: "User",
+      firstName: "Admin",
+    },
     create: {
       email: email,
       passwordHash: passwordHash,
       role: "ADMINISTRATOR",
+      lastName: "User",
+      firstName: "Admin",
     },
   });
   console.log(`Admin user created: ${admin.email}`);
