@@ -13,6 +13,7 @@
       "cache": false
     },
     "prisma:generate": {},
+    "prisma:validate": {},
     "prisma:migrate": {},
     "prisma:studio": {},
     "prisma:seed": {

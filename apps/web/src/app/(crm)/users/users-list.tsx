@@ -2,6 +2,7 @@
 
 import { useQuery } from "@apollo/client/react";
 import { GET_USERS } from "@/shared/api/graphql/users";
+import { CreateUserForm } from "./create-user-form";
 
 export const UsersList = () => {
   const { data, loading, error } = useQuery(GET_USERS);
@@ -18,6 +19,7 @@ export const UsersList = () => {
           </li>
         ))}
       </ul>
+      <CreateUserForm />
     </div>
   );
 };

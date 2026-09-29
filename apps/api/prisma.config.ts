@@ -9,7 +9,7 @@ const appDir = path.dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: path.join(appDir, "../../.env") });
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: "prisma",
 
   migrations: {
     path: "prisma/migrations",

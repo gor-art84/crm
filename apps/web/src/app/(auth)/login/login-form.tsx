@@ -33,7 +33,7 @@ export function LoginForm() {
       <input
         type="email"
         autoComplete="username"
-        {...register("email", { required: "Email is required" })}
+        {...register("email", { required: "Email is required",  })}
         placeholder="Email"
       />
       {errors.email && <p>{errors.email.message}</p>}
