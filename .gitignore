@@ -34,3 +34,9 @@ lerna-debug.log*
 # typescript / next generated
 *.tsbuildinfo
 next-env.d.ts
+
+# agents / llm
+.agents/
+.claude/
+.windsurf/
+skills-lock.json

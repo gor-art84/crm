@@ -1,4 +1,4 @@
-import HelloProbe from "./hello-probe";
+import HelloProbe from "../hello-probe";
 
 export default function Home() {
   return (

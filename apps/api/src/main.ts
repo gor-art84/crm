@@ -1,4 +1,5 @@
 import { NestFactory } from "@nestjs/core";
+import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap() {
@@ -9,6 +10,7 @@ async function bootstrap() {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
+  app.use(cookieParser());
   await app.listen(process.env.PORT ?? 4200);
 }
 await bootstrap();

@@ -11,7 +11,9 @@
     "prisma:format": "turbo run prisma:format",
     "codegen": "turbo run codegen",
     "codegen:watch": " turbo run codegen -- --watch",
-    "prisma:seed": "turbo run prisma:seed"
+    "prisma:seed": "turbo run prisma:seed",
+    "prisma:migrate": "turbo run prisma:migrate",
+    "prisma:studio": "turbo run prisma:studio"
   },
   "keywords": [],
   "author": "",

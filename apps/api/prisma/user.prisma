@@ -1,0 +1,42 @@
+enum Role {
+  ADMINISTRATOR
+  MANAGER
+  METHODIST
+}
+
+enum Permission {
+  USERS_READ
+  USERS_WRITE
+  DEALS_READ
+  DEALS_WRITE
+  PROGRAMS_READ
+  PROGRAMS_WRITE
+}
+
+model User {
+  id           String           @id @default(uuid())
+  email        String           @unique
+  passwordHash String
+  lastName     String           @default("User")
+  firstName    String           @default("Admin")
+  permissions  UserPermission[]
+  middleName   String?
+  birthDate    DateTime?
+  phone        String?
+  telegram     String?
+  whatsapp     String?
+  maxAccount   String?
+  jobTitle     String?
+  role         Role             @default(MANAGER)
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model UserPermission {
+  userId     String
+  permission Permission
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, permission])
+}
