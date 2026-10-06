@@ -11,6 +11,8 @@ enum Permission {
   DEALS_WRITE
   PROGRAMS_READ
   PROGRAMS_WRITE
+  CLIENTS_READ
+  CLIENTS_WRITE
 }
 
 model User {
