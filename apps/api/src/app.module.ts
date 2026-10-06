@@ -7,6 +7,8 @@ import { AppController } from "./app.controller.js";
 import { AppResolver } from "./app.resolver.js";
 import { AppService } from "./app.service.js";
 import { AuthModule } from "./auth/auth.module.js";
+import { ClientsModule } from "./clients/clients.module.js";
+import { DadataModule } from "./dadata/dadata.module.js";
 import { PrismaModule } from "./prisma/prisma.module.js";
 import { RedisModule } from "./redis/redis.module.js";
 import { UsersModule } from "./users/users.module.js";
@@ -27,6 +29,8 @@ import { UsersModule } from "./users/users.module.js";
     RedisModule,
     AuthModule,
     UsersModule,
+    DadataModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
