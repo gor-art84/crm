@@ -11,5 +11,6 @@
   "eslint.enable": false,
   "biome.requireConfiguration": true,
   "js/ts.preferences.preferTypeOnlyAutoImports": false,
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "cSpell.words": ["dadata", "DaData"]
 }
