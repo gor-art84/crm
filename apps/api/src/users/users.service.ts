@@ -1,13 +1,9 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import argon2 from "argon2";
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
+import { emptyToNull } from "../common/empty-to-null.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
-
-function emptyToNull(value: string | null | undefined) {
-  const trimmedValue = value?.trim();
-  return trimmedValue === "" ? null : trimmedValue;
-}
 
 @Injectable()
 export class UsersService {
