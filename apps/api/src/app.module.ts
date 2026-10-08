@@ -8,6 +8,7 @@ import { AppResolver } from "./app.resolver.js";
 import { AppService } from "./app.service.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { ClientsModule } from "./clients/clients.module.js";
+import { envSchema } from "./config/env.schema.js";
 import { DadataModule } from "./dadata/dadata.module.js";
 import { PrismaModule } from "./prisma/prisma.module.js";
 import { RedisModule } from "./redis/redis.module.js";
@@ -18,6 +19,7 @@ import { UsersModule } from "./users/users.module.js";
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: "../../.env",
+      validationSchema: envSchema,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: true,

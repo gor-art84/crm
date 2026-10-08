@@ -1,7 +1,8 @@
-import { BadGatewayException, BadRequestException, Injectable, Logger } from "@nestjs/common";
+import { BadGatewayException, BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { emptyToNull } from "../common/empty-to-null.js";
 import { trimInn } from "../common/trim-inn.js";
+import { EnvConfig } from "../config/env.schema.js";
 import { ClientType } from "../generated/prisma/enums.js";
 import { RedisService } from "../redis/redis.service.js";
 import { DadataParty } from "./dadata-party.js";
@@ -9,9 +10,8 @@ import { PartyPreview } from "./party-preview.js";
 
 @Injectable()
 export class DadataService {
-  private readonly logger = new Logger(DadataService.name);
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvConfig, true>,
     private readonly redisService: RedisService,
   ) {}
 
@@ -68,7 +68,7 @@ export class DadataService {
   private async loadParty(inn: string): Promise<DadataParty> {
     const cachedData = await this.redisService.get(`dadata:party:${inn}`);
     if (!cachedData) {
-      const suggestionsUrl = this.configService.getOrThrow<string>("DADATA_SUGGESTIONS_URL");
+      const suggestionsUrl = this.configService.get("DADATA_SUGGESTIONS_URL");
       const response = await fetch(suggestionsUrl, this.requestInit({ query: inn }));
       if (!response.ok) {
         throw new BadGatewayException("Failed to fetch party");
@@ -80,7 +80,7 @@ export class DadataService {
       await this.redisService.set(
         `dadata:party:${inn}`,
         JSON.stringify(data),
-        Number(this.configService.getOrThrow("DADATA_TTL_SECONDS")),
+        this.configService.get("DADATA_TTL_SECONDS"),
       );
       return data;
     }

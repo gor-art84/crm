@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as argon2 from "argon2";
+import { EnvConfig } from "../config/env.schema.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { RedisService } from "../redis/redis.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
@@ -12,15 +13,13 @@ export class AuthService {
   constructor(
     private readonly redisService: RedisService,
     private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
   async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
-    const TTL_SECONDS = Number(this.configService.getOrThrow<number>("SESSION_TTL_SECONDS"));
-    if (!Number.isFinite(TTL_SECONDS)) {
-      throw new Error("SESSION_TTL_SECONDS must be a number");
-    }
+    const TTL_SECONDS = this.configService.get("SESSION_TTL_SECONDS");
+
     const user = await this.prismaService.user.findUnique({
       where: {
         email: email.toLowerCase(),

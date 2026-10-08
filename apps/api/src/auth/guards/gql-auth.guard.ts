@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
+import { EnvConfig } from "../../config/env.schema.js";
 import { RedisService } from "../../redis/redis.service.js";
 import { RedisSessionData, sessionKey } from "../session.js";
 
@@ -8,23 +9,19 @@ import { RedisSessionData, sessionKey } from "../session.js";
 export class GqlAuthGuard implements CanActivate {
   constructor(
     private readonly redisService: RedisService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const cookieMaxAgeSec = Number(this.configService.getOrThrow("COOKIE_MAX_AGE_SECONDS"));
+    const cookieMaxAgeSec = this.configService.get("COOKIE_MAX_AGE_SECONDS");
     const request = GqlExecutionContext.create(context).getContext().req;
-    const sessionId = request.cookies[this.configService.getOrThrow("COOKIE_NAME")];
-    const sessionTTL = Number(this.configService.getOrThrow("SESSION_TTL_SECONDS"));
-    if (!Number.isFinite(cookieMaxAgeSec)) {
-      throw new Error("COOKIE_MAX_AGE_SECONDS must be a number");
-    }
-    if (!Number.isFinite(sessionTTL)) {
-      throw new Error("SESSION_TTL_SECONDS must be a number");
-    }
+    const sessionId = request.cookies[this.configService.get("COOKIE_NAME")];
+    const sessionTTL = this.configService.get("SESSION_TTL_SECONDS");
+
     if (!sessionId) {
       throw new UnauthorizedException("Unauthorized");
     }
+
     const session = await this.redisService.get(sessionKey(sessionId));
     if (!session) {
       throw new UnauthorizedException("Unauthorized");
