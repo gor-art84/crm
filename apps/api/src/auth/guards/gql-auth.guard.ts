@@ -13,10 +13,10 @@ export class GqlAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const cookieMaxAgeSec = this.configService.get("COOKIE_MAX_AGE_SECONDS");
+    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS");
     const request = GqlExecutionContext.create(context).getContext().req;
     const sessionId = request.cookies[this.configService.get("COOKIE_NAME")];
-    const sessionTTL = this.configService.get("SESSION_TTL_SECONDS");
+    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS");
 
     if (!sessionId) {
       throw new UnauthorizedException("Unauthorized");
@@ -35,12 +35,12 @@ export class GqlAuthGuard implements CanActivate {
     }
 
     const issuedAtMs = Date.parse(payload.issuedAt);
-    if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > cookieMaxAgeSec) {
+    if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > absoluteTimeoutSeconds) {
       await this.redisService.del(sessionKey(sessionId));
       throw new UnauthorizedException("Unauthorized");
     }
 
-    await this.redisService.expire(sessionKey(sessionId), sessionTTL);
+    await this.redisService.expire(sessionKey(sessionId), sessionIdleTimeoutSeconds);
     request.user = {
       id: payload.userId,
       email: payload.userEmail,

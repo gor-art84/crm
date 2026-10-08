@@ -19,12 +19,12 @@ export class AuthResolver {
   @Mutation(() => AuthPayload)
   async login(@Args("input") input: LoginInput, @Context() context: GqlContext) {
     const cookieName = this.configService.get("COOKIE_NAME");
-    const maxAgeSec = this.configService.get("COOKIE_MAX_AGE_SECONDS");
+    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS");
 
     const { payload, sessionId } = await this.authService.login(input);
     context.res.cookie(cookieName, sessionId, {
       ...sessionCookieOptions(this.configService.get("NODE_ENV") === "production"),
-      maxAge: maxAgeSec * 1000,
+      maxAge: absoluteTimeoutSeconds * 1000,
     });
     return payload;
   }

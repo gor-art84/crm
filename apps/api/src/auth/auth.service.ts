@@ -18,7 +18,7 @@ export class AuthService {
 
   async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
-    const TTL_SECONDS = this.configService.get("SESSION_TTL_SECONDS");
+    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS");
 
     const user = await this.prismaService.user.findUnique({
       where: {
@@ -48,7 +48,11 @@ export class AuthService {
       userRole: user.role,
       issuedAt: new Date().toISOString(),
     };
-    await this.redisService.set(sessionKey(sessionId), JSON.stringify(sessionData), TTL_SECONDS);
+    await this.redisService.set(
+      sessionKey(sessionId),
+      JSON.stringify(sessionData),
+      sessionIdleTimeoutSeconds,
+    );
 
     return {
       payload: {

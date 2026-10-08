@@ -4,9 +4,9 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
   PORT: z.coerce.number().int().min(1024).max(65535).default(4200),
   CORS_ORIGIN: z.url(),
-  SESSION_TTL_SECONDS: z.coerce.number().int().min(1),
+  SESSION_IDLE_TIMEOUT_SECONDS: z.coerce.number().int().min(1),
   COOKIE_NAME: z.string().min(1).default("sessionId"),
-  COOKIE_MAX_AGE_SECONDS: z.coerce.number().int().min(1),
+  SESSION_ABSOLUTE_TIMEOUT_SECONDS: z.coerce.number().int().min(1),
   DATABASE_URL: z.url(),
   REDIS_URL: z.url(),
   // =============================== Dadata API =================================
