@@ -13,7 +13,8 @@
     "codegen:watch": " turbo run codegen -- --watch",
     "prisma:seed": "turbo run prisma:seed",
     "prisma:migrate": "turbo run prisma:migrate",
-    "prisma:studio": "turbo run prisma:studio"
+    "prisma:studio": "turbo run prisma:studio",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,9 @@
   "type": "module",
   "devDependencies": {
     "@biomejs/biome": "2.5.12",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "husky": "^9.1.7",
     "turbo": "^2.10.12"
   }
 }
