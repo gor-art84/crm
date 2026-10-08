@@ -18,12 +18,14 @@ export class AuthResolver {
 
   @Mutation(() => AuthPayload)
   async login(@Args("input") input: LoginInput, @Context() context: GqlContext) {
-    const cookieName = this.configService.get("COOKIE_NAME");
-    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS");
+    const cookieName = this.configService.get("COOKIE_NAME", { infer: true });
+    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS", {
+      infer: true,
+    });
 
     const { payload, sessionId } = await this.authService.login(input);
     context.res.cookie(cookieName, sessionId, {
-      ...sessionCookieOptions(this.configService.get("NODE_ENV") === "production"),
+      ...sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
       maxAge: absoluteTimeoutSeconds * 1000,
     });
     return payload;
@@ -37,12 +39,12 @@ export class AuthResolver {
 
   @Mutation(() => Boolean)
   async logout(@Context() context: GqlContext): Promise<boolean> {
-    const cookieName = this.configService.get("COOKIE_NAME");
+    const cookieName = this.configService.get("COOKIE_NAME", { infer: true });
     const sessionId = context.req.cookies?.[cookieName] as string | undefined;
     await this.authService.logout(sessionId);
     context.res.clearCookie(
       cookieName,
-      sessionCookieOptions(this.configService.get("NODE_ENV") === "production"),
+      sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
     );
     return true;
   }

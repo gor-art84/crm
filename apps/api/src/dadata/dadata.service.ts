@@ -53,7 +53,7 @@ export class DadataService {
   }
 
   private requestInit(body: unknown) {
-    const apiKey = this.configService.get("DADATA_API_KEY");
+    const apiKey = this.configService.get("DADATA_API_KEY", { infer: true });
     return {
       method: "POST",
       headers: {
@@ -68,7 +68,7 @@ export class DadataService {
   private async loadParty(inn: string): Promise<DadataParty> {
     const cachedData = await this.redisService.get(`dadata:party:${inn}`);
     if (!cachedData) {
-      const suggestionsUrl = this.configService.get("DADATA_SUGGESTIONS_URL");
+      const suggestionsUrl = this.configService.get("DADATA_SUGGESTIONS_URL", { infer: true });
       const response = await fetch(suggestionsUrl, this.requestInit({ query: inn }));
       if (!response.ok) {
         throw new BadGatewayException("Failed to fetch party");
@@ -80,7 +80,7 @@ export class DadataService {
       await this.redisService.set(
         `dadata:party:${inn}`,
         JSON.stringify(data),
-        this.configService.get("DADATA_TTL_SECONDS"),
+        this.configService.get("DADATA_TTL_SECONDS", { infer: true }),
       );
       return data;
     }

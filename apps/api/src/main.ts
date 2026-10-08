@@ -9,11 +9,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService<EnvConfig, true>);
   app.enableShutdownHooks();
   app.enableCors({
-    origin: configService.get("CORS_ORIGIN"),
+    origin: configService.get("CORS_ORIGIN", { infer: true }),
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
   app.use(cookieParser());
-  await app.listen(configService.get("PORT"));
+  await app.listen(configService.get("PORT", { infer: true }));
 }
 await bootstrap();

@@ -18,7 +18,9 @@ export class AuthService {
 
   async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
-    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS");
+    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS", {
+      infer: true,
+    });
 
     const user = await this.prismaService.user.findUnique({
       where: {
