@@ -29,7 +29,7 @@ export class UsersService {
         updatedAt: true,
       },
       orderBy: {
-        lastName: "asc",
+        createdAt: "desc",
       },
     });
   }
