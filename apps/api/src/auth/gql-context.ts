@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { AuthPayload } from "./dto/auth.payload.js";
+import { RedisSessionData } from "./session.js";
 
 export interface GqlContext {
-  req: Request & { user?: AuthPayload };
+  req: Request & { session?: RedisSessionData };
   res: Response;
 }

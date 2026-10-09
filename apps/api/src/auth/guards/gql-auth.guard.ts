@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
 import { EnvConfig } from "../../config/env.schema.js";
 import { RedisService } from "../../redis/redis.service.js";
+import { GqlContext } from "../gql-context.js";
 import { RedisSessionData, sessionKey } from "../session.js";
 
 @Injectable()
@@ -16,7 +17,7 @@ export class GqlAuthGuard implements CanActivate {
     const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS", {
       infer: true,
     });
-    const request = GqlExecutionContext.create(context).getContext().req;
+    const request: GqlContext["req"] = GqlExecutionContext.create(context).getContext().req;
     const sessionId = request.cookies[this.configService.get("COOKIE_NAME", { infer: true })];
     const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS", {
       infer: true,
@@ -45,11 +46,7 @@ export class GqlAuthGuard implements CanActivate {
     }
 
     await this.redisService.expire(sessionKey(sessionId), sessionIdleTimeoutSeconds);
-    request.user = {
-      id: payload.userId,
-      email: payload.userEmail,
-      role: payload.userRole,
-    };
+    request.session = payload;
     return true;
   }
 }
