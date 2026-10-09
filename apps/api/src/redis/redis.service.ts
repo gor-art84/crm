@@ -43,4 +43,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   expire(key: string, ttlSeconds: number) {
     return this.client.expire(key, ttlSeconds);
   }
+
+  sAdd(key: string, value: string) {
+    return this.client.sAdd(key, value);
+  }
+
+  sRem(key: string, value: string) {
+    return this.client.sRem(key, value);
+  }
 }
