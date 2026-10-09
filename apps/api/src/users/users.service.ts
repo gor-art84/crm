@@ -1,13 +1,9 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import argon2 from "argon2";
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
+import { emptyToNull } from "../common/empty-to-null.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
-
-function emptyToNull(value: string | null | undefined) {
-  const trimmedValue = value?.trim();
-  return trimmedValue === "" ? null : trimmedValue;
-}
 
 @Injectable()
 export class UsersService {
@@ -29,6 +25,8 @@ export class UsersService {
         jobTitle: true,
         role: true,
         isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: {
         lastName: "asc",
@@ -37,10 +35,10 @@ export class UsersService {
   }
 
   async create(createUserInput: CreateUserInput) {
-    const effectivePermissions = new Set([
-      ...ROLE_PERMISSIONS[createUserInput.role],
-      ...(createUserInput.extraPermissions ?? []),
-    ]);
+    const extraPermissions = new Set(createUserInput.extraPermissions ?? []);
+    const permissionsBeyondRole = Array.from(extraPermissions).filter(
+      (permission) => !ROLE_PERMISSIONS[createUserInput.role].includes(permission),
+    );
 
     const passwordHash = await argon2.hash(createUserInput.password);
     const email = createUserInput.email.toLowerCase();
@@ -70,7 +68,7 @@ export class UsersService {
         isActive: true,
         passwordHash,
         permissions: {
-          create: Array.from(effectivePermissions).map((permission) => ({ permission })),
+          create: permissionsBeyondRole.map((permission) => ({ permission })),
         },
       },
       select: {

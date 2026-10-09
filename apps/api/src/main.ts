@@ -1,16 +1,19 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module.js";
+import { EnvConfig } from "./config/env.schema.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService<EnvConfig, true>);
   app.enableShutdownHooks();
   app.enableCors({
-    origin: "http://localhost:3000",
+    origin: configService.get("CORS_ORIGIN", { infer: true }),
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
   app.use(cookieParser());
-  await app.listen(process.env.PORT ?? 4200);
+  await app.listen(configService.get("PORT", { infer: true }));
 }
 await bootstrap();

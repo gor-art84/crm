@@ -1,30 +1,32 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
+import { EnvConfig } from "../../config/env.schema.js";
 import { RedisService } from "../../redis/redis.service.js";
+import { GqlContext } from "../gql-context.js";
 import { RedisSessionData, sessionKey } from "../session.js";
 
 @Injectable()
 export class GqlAuthGuard implements CanActivate {
   constructor(
     private readonly redisService: RedisService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const cookieMaxAgeSec = Number(this.configService.getOrThrow("COOKIE_MAX_AGE_SECONDS"));
-    const request = GqlExecutionContext.create(context).getContext().req;
-    const sessionId = request.cookies[this.configService.getOrThrow("COOKIE_NAME")];
-    const sessionTTL = Number(this.configService.getOrThrow("SESSION_TTL_SECONDS"));
-    if (!Number.isFinite(cookieMaxAgeSec)) {
-      throw new Error("COOKIE_MAX_AGE_SECONDS must be a number");
-    }
-    if (!Number.isFinite(sessionTTL)) {
-      throw new Error("SESSION_TTL_SECONDS must be a number");
-    }
+    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS", {
+      infer: true,
+    });
+    const request: GqlContext["req"] = GqlExecutionContext.create(context).getContext().req;
+    const sessionId = request.cookies[this.configService.get("COOKIE_NAME", { infer: true })];
+    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS", {
+      infer: true,
+    });
+
     if (!sessionId) {
       throw new UnauthorizedException("Unauthorized");
     }
+
     const session = await this.redisService.get(sessionKey(sessionId));
     if (!session) {
       throw new UnauthorizedException("Unauthorized");
@@ -38,17 +40,13 @@ export class GqlAuthGuard implements CanActivate {
     }
 
     const issuedAtMs = Date.parse(payload.issuedAt);
-    if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > cookieMaxAgeSec) {
+    if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > absoluteTimeoutSeconds) {
       await this.redisService.del(sessionKey(sessionId));
       throw new UnauthorizedException("Unauthorized");
     }
 
-    await this.redisService.expire(sessionKey(sessionId), sessionTTL);
-    request.user = {
-      id: payload.userId,
-      email: payload.userEmail,
-      role: payload.userRole,
-    };
+    await this.redisService.expire(sessionKey(sessionId), sessionIdleTimeoutSeconds);
+    request.session = payload;
     return true;
   }
 }

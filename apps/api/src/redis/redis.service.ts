@@ -1,14 +1,15 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createClient, type RedisClientType } from "redis";
+import { EnvConfig } from "../config/env.schema.js";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly client: RedisClientType;
   private readonly logger = new Logger(RedisService.name);
-  constructor(configService: ConfigService) {
+  constructor(configService: ConfigService<EnvConfig, true>) {
     this.client = createClient({
-      url: configService.getOrThrow("REDIS_URL"),
+      url: configService.get("REDIS_URL", { infer: true }),
     });
     this.client.on("error", (err) => {
       this.logger.error("Redis error", err.message);

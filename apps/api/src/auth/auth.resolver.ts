@@ -1,6 +1,7 @@
-import { UseGuards } from "@nestjs/common";
+import { UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { EnvConfig } from "../config/env.schema.js";
 import { AuthService } from "./auth.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
 import { LoginInput } from "./dto/login.input.dto.js";
@@ -12,38 +13,42 @@ import { sessionCookieOptions } from "./session.js";
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
   @Mutation(() => AuthPayload)
   async login(@Args("input") input: LoginInput, @Context() context: GqlContext) {
-    const cookieName = this.configService.getOrThrow<string>("COOKIE_NAME");
-    const maxAgeSec = Number(this.configService.getOrThrow("COOKIE_MAX_AGE_SECONDS"));
-    if (!Number.isFinite(maxAgeSec)) {
-      throw new Error("COOKIE_MAX_AGE_SECONDS must be a number");
-    }
+    const cookieName = this.configService.get("COOKIE_NAME", { infer: true });
+    const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS", {
+      infer: true,
+    });
+
     const { payload, sessionId } = await this.authService.login(input);
     context.res.cookie(cookieName, sessionId, {
-      ...sessionCookieOptions(process.env.NODE_ENV === "production"),
-      maxAge: maxAgeSec * 1000,
+      ...sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
+      maxAge: absoluteTimeoutSeconds * 1000,
     });
     return payload;
   }
 
   @UseGuards(GqlAuthGuard)
   @Query(() => AuthPayload)
-  me(@Context() context: GqlContext) {
-    return context.req.user;
+  async me(@Context() context: GqlContext): Promise<AuthPayload> {
+    const userId = context.req.session?.userId;
+    if (!userId) {
+      throw new UnauthorizedException("Unauthorized");
+    }
+    return await this.authService.me(userId);
   }
 
   @Mutation(() => Boolean)
   async logout(@Context() context: GqlContext): Promise<boolean> {
-    const cookieName = this.configService.getOrThrow<string>("COOKIE_NAME");
+    const cookieName = this.configService.get("COOKIE_NAME", { infer: true });
     const sessionId = context.req.cookies?.[cookieName] as string | undefined;
     await this.authService.logout(sessionId);
     context.res.clearCookie(
       cookieName,
-      sessionCookieOptions(process.env.NODE_ENV === "production"),
+      sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
     );
     return true;
   }

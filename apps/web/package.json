@@ -28,5 +28,5 @@
     "@types/react-dom": "^19",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@12.9.1"
 }
