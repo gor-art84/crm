@@ -46,7 +46,6 @@ export class AuthService {
     const sessionId = crypto.randomUUID();
     const sessionData: RedisSessionData = {
       userId: user.id,
-      userEmail: user.email,
       issuedAt: new Date().toISOString(),
     };
     await this.redisService.set(

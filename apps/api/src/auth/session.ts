@@ -1,6 +1,5 @@
 export interface RedisSessionData {
   userId: string;
-  userEmail: string;
   issuedAt: string;
 }
 
