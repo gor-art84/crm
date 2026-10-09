@@ -76,9 +76,9 @@ export class AuthService {
   async me(userId: string): Promise<AuthPayload> {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, role: true },
+      select: { id: true, email: true, role: true, isActive: true },
     });
-    if (!user) {
+    if (!user?.isActive) {
       throw new UnauthorizedException("Unauthorized");
     }
     return { id: user.id, email: user.email, role: user.role };
