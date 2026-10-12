@@ -2,14 +2,13 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
 import { EnvConfig } from "../../config/env.schema.js";
-import { RedisService } from "../../redis/redis.service.js";
 import { GqlContext } from "../gql-context.js";
-import { RedisSessionData, sessionKey } from "../session.js";
+import { SessionsService } from "../sessions.service.js";
 
 @Injectable()
 export class GqlAuthGuard implements CanActivate {
   constructor(
-    private readonly redisService: RedisService,
+    private readonly sessionsService: SessionsService,
     private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
@@ -19,34 +18,26 @@ export class GqlAuthGuard implements CanActivate {
     });
     const request: GqlContext["req"] = GqlExecutionContext.create(context).getContext().req;
     const sessionId = request.cookies[this.configService.get("COOKIE_NAME", { infer: true })];
-    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS", {
-      infer: true,
-    });
 
     if (!sessionId) {
       throw new UnauthorizedException("Unauthorized");
     }
 
-    const session = await this.redisService.get(sessionKey(sessionId));
+    const session = await this.sessionsService.readSession(sessionId);
     if (!session) {
       throw new UnauthorizedException("Unauthorized");
     }
 
-    let payload: RedisSessionData;
-    try {
-      payload = JSON.parse(session);
-    } catch {
-      throw new UnauthorizedException("Unauthorized");
-    }
+    const { issuedAt } = session;
 
-    const issuedAtMs = Date.parse(payload.issuedAt);
+    const issuedAtMs = Date.parse(issuedAt);
     if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > absoluteTimeoutSeconds) {
-      await this.redisService.del(sessionKey(sessionId));
+      await this.sessionsService.deleteSession(sessionId);
       throw new UnauthorizedException("Unauthorized");
     }
 
-    await this.redisService.expire(sessionKey(sessionId), sessionIdleTimeoutSeconds);
-    request.session = payload;
+    await this.sessionsService.touchSession(sessionId);
+    request.session = session;
     return true;
   }
 }
