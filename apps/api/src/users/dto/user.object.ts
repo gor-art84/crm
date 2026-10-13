@@ -22,29 +22,29 @@ export class UserObject {
   isActive: boolean;
 
   @Field(() => String, { nullable: true })
-  middleName?: string;
+  middleName: string | null;
 
   @Field(() => Date, { nullable: true })
-  birthDate?: Date;
+  birthDate: Date | null;
 
   @Field(() => String, { nullable: true })
-  phone?: string;
+  phone: string | null;
 
   @Field(() => String, { nullable: true })
-  telegram?: string;
+  telegram: string | null;
 
   @Field(() => String, { nullable: true })
-  whatsapp?: string;
+  whatsapp: string | null;
 
   @Field(() => String, { nullable: true })
-  maxAccount?: string;
+  maxAccount: string | null;
 
   @Field(() => String, { nullable: true })
-  jobTitle?: string;
+  jobTitle: string | null;
 
   @Field(() => Date, { nullable: true })
-  createdAt?: Date;
+  createdAt?: Date | null;
 
   @Field(() => Date, { nullable: true })
-  updatedAt?: Date;
+  updatedAt?: Date | null;
 }
