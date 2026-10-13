@@ -1,11 +1,14 @@
 export interface RedisSessionData {
   userId: string;
-  userEmail: string;
   issuedAt: string;
 }
 
 export function sessionKey(sessionId: string): string {
   return `sessionId:${sessionId}`;
+}
+
+export function userSessionsKey(userId: string): string {
+  return `userSessions:${userId}`;
 }
 
 export function sessionCookieOptions(secure: boolean): {

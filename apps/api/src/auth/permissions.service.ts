@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { Permission } from "../generated/prisma/enums.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { ROLE_PERMISSIONS } from "./role-permissions.js";
@@ -17,10 +17,11 @@ export class PermissionsService {
             permission: true,
           },
         },
+        isActive: true,
       },
     });
-    if (!user) {
-      return new Set();
+    if (!user?.isActive) {
+      throw new UnauthorizedException("Unauthorized");
     }
     const extra = user.permissions.map((permission) => permission.permission);
     return new Set([...ROLE_PERMISSIONS[user.role], ...extra]);
