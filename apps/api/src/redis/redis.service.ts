@@ -36,7 +36,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.get(key);
   }
 
-  del(key: string) {
+  del(key: string | string[]) {
     return this.client.del(key);
   }
 
@@ -50,5 +50,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   sRem(key: string, value: string) {
     return this.client.sRem(key, value);
+  }
+
+  sMembers(key: string) {
+    return this.client.sMembers(key);
   }
 }

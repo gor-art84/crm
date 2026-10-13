@@ -1,40 +1,51 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import argon2 from "argon2";
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
+import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
+import { Prisma, Role } from "../generated/prisma/client.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
+import { UserObject } from "./dto/user.object.js";
+
+const userSelect = {
+  id: true,
+  email: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  birthDate: true,
+  phone: true,
+  telegram: true,
+  whatsapp: true,
+  maxAccount: true,
+  jobTitle: true,
+  role: true,
+  isActive: true,
+} satisfies Prisma.UserSelect;
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly sessionsService: SessionsService,
+  ) {}
 
-  async findMany() {
+  async findMany(): Promise<UserObject[]> {
     return this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        middleName: true,
-        lastName: true,
-        birthDate: true,
-        phone: true,
-        telegram: true,
-        whatsapp: true,
-        maxAccount: true,
-        jobTitle: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: { ...userSelect, createdAt: true, updatedAt: true },
       orderBy: {
         createdAt: "desc",
       },
     });
   }
 
-  async create(createUserInput: CreateUserInput) {
+  async create(createUserInput: CreateUserInput): Promise<UserObject> {
     const extraPermissions = new Set(createUserInput.extraPermissions ?? []);
     const permissionsBeyondRole = Array.from(extraPermissions).filter(
       (permission) => !ROLE_PERMISSIONS[createUserInput.role].includes(permission),
@@ -71,23 +82,41 @@ export class UsersService {
           create: permissionsBeyondRole.map((permission) => ({ permission })),
         },
       },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        middleName: true,
-        lastName: true,
-        birthDate: true,
-        phone: true,
-        telegram: true,
-        whatsapp: true,
-        maxAccount: true,
-        jobTitle: true,
-        role: true,
-        isActive: true,
-      },
+      select: userSelect,
     });
 
     return user;
+  }
+
+  async deactivate(userId: string, actorUserId: string): Promise<UserObject> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: userSelect,
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException("Пользователь не найден");
+    }
+
+    if (actorUserId === existingUser.id) {
+      throw new ForbiddenException("Нельзя деактивировать самого себя");
+    }
+
+    if (existingUser.role === Role.ADMINISTRATOR && existingUser.isActive) {
+      const adminUsers = await this.prisma.user.count({
+        where: { role: Role.ADMINISTRATOR, isActive: true },
+      });
+      if (adminUsers <= 1 && existingUser.role === Role.ADMINISTRATOR && existingUser.isActive) {
+        throw new ForbiddenException("Нельзя деактивировать последнего администратора");
+      }
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { isActive: false },
+      select: userSelect,
+    });
+    await this.sessionsService.revokeAllSessions(userId);
+    return updatedUser;
   }
 }

@@ -1,33 +1,19 @@
-import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import * as argon2 from "argon2";
-import { EnvConfig } from "../config/env.schema.js";
 import { PrismaService } from "../prisma/prisma.service.js";
-import { RedisService } from "../redis/redis.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
 import { LoginInput } from "./dto/login.input.dto.js";
-import { RedisSessionData, sessionKey, userSessionsKey } from "./session.js";
+import { SessionsService } from "./sessions.service.js";
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   constructor(
-    private readonly redisService: RedisService,
     private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService<EnvConfig, true>,
+    private readonly sessionsService: SessionsService,
   ) {}
 
   async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
-    const sessionIdleTimeoutSeconds = this.configService.get("SESSION_IDLE_TIMEOUT_SECONDS", {
-      infer: true,
-    });
-    const sessionAbsoluteTimeoutSeconds = this.configService.get(
-      "SESSION_ABSOLUTE_TIMEOUT_SECONDS",
-      {
-        infer: true,
-      },
-    );
 
     const user = await this.prismaService.user.findUnique({
       where: {
@@ -50,18 +36,8 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    const sessionId = crypto.randomUUID();
-    const sessionData: RedisSessionData = {
-      userId: user.id,
-      issuedAt: new Date().toISOString(),
-    };
-    await this.redisService.set(
-      sessionKey(sessionId),
-      JSON.stringify(sessionData),
-      sessionIdleTimeoutSeconds,
-    );
-    await this.redisService.sAdd(userSessionsKey(user.id), sessionId);
-    await this.redisService.expire(userSessionsKey(user.id), sessionAbsoluteTimeoutSeconds);
+    const sessionId = await this.sessionsService.createSession(user.id);
+
     return {
       payload: {
         id: user.id,
@@ -76,17 +52,7 @@ export class AuthService {
     if (!sessionId) {
       return;
     }
-    const sessionData = await this.redisService.get(sessionKey(sessionId));
-    if (!sessionData) {
-      return;
-    }
-    await this.redisService.del(sessionKey(sessionId));
-    try {
-      const sessionDataObject: RedisSessionData = JSON.parse(sessionData);
-      await this.redisService.sRem(userSessionsKey(sessionDataObject.userId), sessionId);
-    } catch (error) {
-      this.logger.error(`Error removing session from user sessions set: ${error}`);
-    }
+    await this.sessionsService.deleteSession(sessionId);
   }
 
   async me(userId: string): Promise<AuthPayload> {
