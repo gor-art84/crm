@@ -68,4 +68,16 @@ export class SessionsService {
   async touchSession(sessionId: string): Promise<void> {
     await this.redisService.expire(sessionKey(sessionId), this.sessionIdleTimeoutSeconds);
   }
+
+  async revokeAllSessions(userId: string): Promise<void> {
+    const sessionIds = await this.redisService.sMembers(userSessionsKey(userId));
+    if (sessionIds.length === 0) {
+      return;
+    }
+
+    const sessionKeys = sessionIds.map((sessionId) => sessionKey(sessionId));
+
+    await this.redisService.del(sessionKeys);
+    await this.redisService.del(userSessionsKey(userId));
+  }
 }
