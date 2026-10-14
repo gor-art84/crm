@@ -6,6 +6,7 @@ import { GqlAuthGuard } from "../auth/guards/gql-auth.guard.js";
 import { PermissionsGuard } from "../auth/guards/permissions.guard.js";
 import { Permission } from "../generated/prisma/enums.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
+import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
 import { UsersService } from "./users.service.js";
 
@@ -43,5 +44,15 @@ export class UsersResolver {
   @Permissions(Permission.USERS_WRITE)
   async activateUser(@Args("userId") userId: string) {
     return this.usersService.activate(userId);
+  }
+
+  @Mutation(() => UserObject)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions(Permission.USERS_WRITE)
+  async updateUser(
+    @Args("userId") userId: string,
+    @Args("input") updateUserInput: UpdateUserInput,
+  ) {
+    return this.usersService.update(userId, updateUserInput);
   }
 }
