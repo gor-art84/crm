@@ -1,5 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 
+declare module "@mui/material/Paper" {
+  interface PaperPropsVariantOverrides {
+    glass: true;
+  }
+}
+
 export const crmTheme = createTheme({
   cssVariables: true,
   colorSchemes: {
@@ -119,6 +125,57 @@ export const crmTheme = createTheme({
           border: `1px solid ${theme.vars.palette.divider}`,
           borderRadius: 12,
           backgroundImage: "none",
+        }),
+      },
+      variants: [
+        {
+          props: { variant: "glass" },
+          style: ({ theme }) => ({
+            backgroundColor: "rgba(255, 255, 255, 0.92)",
+            border: "1px solid rgba(17, 19, 24, 0.06)",
+            borderRadius: 20,
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
+            "@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              backdropFilter: "blur(24px) saturate(170%)",
+              WebkitBackdropFilter: "blur(24px) saturate(170%)",
+            },
+            "@media (prefers-reduced-transparency: reduce)": {
+              backgroundColor: theme.vars.palette.background.paper,
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+            },
+            "@media (prefers-contrast: more)": {
+              backgroundColor: theme.vars.palette.background.paper,
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+              border: `1px solid ${theme.vars.palette.text.secondary}`,
+            },
+          }),
+        },
+      ],
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: 8,
+          minHeight: 36,
+          paddingInline: 10,
+          gap: 10,
+          color: theme.vars.palette.text.secondary,
+          transition: theme.transitions.create(["background-color", "color"], {
+            duration: 150,
+          }),
+          "&:hover": {
+            backgroundColor: theme.vars.palette.action.hover,
+          },
+          "&.Mui-selected": {
+            backgroundColor: theme.vars.palette.action.selected,
+            color: theme.vars.palette.text.primary,
+          },
+          "&.Mui-selected:hover": {
+            backgroundColor: theme.vars.palette.action.selected,
+          },
         }),
       },
     },
