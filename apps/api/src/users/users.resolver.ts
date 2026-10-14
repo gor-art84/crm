@@ -37,4 +37,11 @@ export class UsersResolver {
     }
     return this.usersService.deactivate(userId, actorUserId);
   }
+
+  @Mutation(() => UserObject)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions(Permission.USERS_WRITE)
+  async activateUser(@Args("userId") userId: string) {
+    return this.usersService.activate(userId);
+  }
 }
