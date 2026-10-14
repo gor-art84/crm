@@ -27,3 +27,17 @@ export const CREATE_USER = gql(`
     }
   }
 `);
+
+export const DEACTIVATE_USER = gql(`
+  mutation DeactivateUser($userId: String!) {
+    deactivateUser(userId: $userId) {
+      id
+      email
+      firstName
+      middleName
+      lastName
+      role
+      isActive
+    }
+  }
+`);
