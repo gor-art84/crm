@@ -136,7 +136,7 @@ export const crmTheme = createTheme({
             borderRadius: 20,
             boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
             "@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
-              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              backgroundColor: "rgba(255, 255, 255, 0.6)",
               backdropFilter: "blur(24px) saturate(170%)",
               WebkitBackdropFilter: "blur(24px) saturate(170%)",
             },
@@ -183,7 +183,7 @@ export const crmTheme = createTheme({
       styleOverrides: {
         body: {
           backgroundImage:
-            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.12), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.10), transparent 45%)",
+            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.22), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.16), transparent 55%)",
           backgroundAttachment: "fixed",
           minHeight: "100vh",
         },
