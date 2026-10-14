@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client/react";
 import { useForm } from "react-hook-form";
 import type { Role } from "@/generated/graphql";
 import { CREATE_USER, GET_USERS } from "@/shared/api/graphql/users";
+import { ROLE_LABELS } from "@/shared/model/roles";
 
 type CreateUserFields = {
   email: string;
@@ -13,12 +14,6 @@ type CreateUserFields = {
   phone?: string;
   jobTitle?: string;
 };
-
-const roles: { value: Role; label: string }[] = [
-  { value: "ADMINISTRATOR", label: "Администратор" },
-  { value: "MANAGER", label: "Менеджер" },
-  { value: "METHODIST", label: "Методист" },
-];
 
 export const CreateUserForm = () => {
   const [createUser, { loading, error }] = useMutation(CREATE_USER);
@@ -79,9 +74,9 @@ export const CreateUserForm = () => {
         <input type="text" {...register("middleName")} placeholder="Отчество" />
 
         <select {...register("role", { required: "Роль обязательна" })}>
-          {roles.map((role) => (
-            <option key={role.value} value={role.value}>
-              {role.label}
+          {Object.entries(ROLE_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
             </option>
           ))}
         </select>
