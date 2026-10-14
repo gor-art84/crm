@@ -119,4 +119,22 @@ export class UsersService {
     await this.sessionsService.revokeAllSessions(userId);
     return updatedUser;
   }
+
+  async activate(userId: string): Promise<UserObject> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: userSelect,
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException("Пользователь не найден");
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { isActive: true },
+      select: userSelect,
+    });
+    return updatedUser;
+  }
 }
