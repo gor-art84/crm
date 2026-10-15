@@ -1,7 +1,7 @@
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import { SidebarNav } from "./SidebarNav";
-import { SidebarUser } from "./SidebarUser";
+import { SidebarNav } from "./sidebar-nav";
+import { SidebarUser } from "./sidebar-user";
 
 export const Sidebar = () => {
   return (
