@@ -1,15 +1,6 @@
 import type { ReactNode } from "react";
-import { AppNav } from "./nav";
-import { SessionBar } from "./session-bar";
+import { AppShell } from "@/widgets/app-shell";
 
 export default function CrmLayout({ children }: { children: ReactNode }) {
-  return (
-    <div>
-      <header>
-        <SessionBar />
-        <AppNav />
-      </header>
-      {children}
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }
