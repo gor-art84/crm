@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ME } from "@/shared/api/graphql/me";
 import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
-import { CreateUserForm } from "./create-user-form";
+import { CreateUserDrawer } from "./create-user-drawer";
 import {
   filterUsers,
   parseUsersFilters,
@@ -31,6 +31,8 @@ export const UsersList = () => {
   });
 
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+
+  const [open, setOpen] = useState(false);
 
   const pathName = usePathname();
   const router = useRouter();
@@ -93,6 +95,9 @@ export const UsersList = () => {
             ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
             : `Всего: ${data.users.length}`}
         </Typography>
+        <Button variant="contained" size="small" onClick={() => setOpen(true)}>
+          Добавить пользователя
+        </Button>
       </Stack>
       {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
       {data.users.length === 0 ? (
@@ -122,7 +127,7 @@ export const UsersList = () => {
           pendingUserId={pendingUserId}
         />
       )}
-      <CreateUserForm />
+      <CreateUserDrawer open={open} onClose={() => setOpen(false)} />
     </Stack>
   );
 };
