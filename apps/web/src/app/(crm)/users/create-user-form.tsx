@@ -36,7 +36,7 @@ export const CreateUserForm = () => {
 
   return (
     <div>
-      <h1>Create User</h1>
+      <h2>Новый пользователь</h2>
       <form onSubmit={onSubmit}>
         <input
           type="email"
