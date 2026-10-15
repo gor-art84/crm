@@ -1,5 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 
+declare module "@mui/material/Paper" {
+  interface PaperPropsVariantOverrides {
+    glass: true;
+  }
+}
+
 export const crmTheme = createTheme({
   cssVariables: true,
   colorSchemes: {
@@ -121,12 +127,74 @@ export const crmTheme = createTheme({
           backgroundImage: "none",
         }),
       },
+      variants: [
+        {
+          props: { variant: "glass" },
+          style: ({ theme }) => ({
+            backgroundColor: "rgba(255, 255, 255, 0.92)",
+            border: "1px solid rgba(17, 19, 24, 0.06)",
+            borderRadius: 20,
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
+            "@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
+              backgroundColor: "rgba(255, 255, 255, 0.4)",
+              backgroundImage:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.6)",
+              boxShadow: [
+                "inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+                "inset 0 -1px 0 rgba(255, 255, 255, 0.3)",
+                "0 0 0 1px rgba(17, 19, 24, 0.06)",
+                "0 8px 32px rgba(17, 19, 24, 0.08)",
+              ].join(", "),
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            },
+            "@media (prefers-reduced-transparency: reduce)": {
+              backgroundColor: theme.vars.palette.background.paper,
+              backgroundImage: "none",
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+            },
+            "@media (prefers-contrast: more)": {
+              backgroundColor: theme.vars.palette.background.paper,
+              backgroundImage: "none",
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+              border: `1px solid ${theme.vars.palette.text.secondary}`,
+            },
+          }),
+        },
+      ],
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: 8,
+          minHeight: 36,
+          paddingInline: 10,
+          gap: 10,
+          color: theme.vars.palette.text.secondary,
+          transition: theme.transitions.create(["background-color", "color"], {
+            duration: 150,
+          }),
+          "&:hover": {
+            backgroundColor: theme.vars.palette.action.hover,
+          },
+          "&.Mui-selected": {
+            backgroundColor: theme.vars.palette.action.selected,
+            color: theme.vars.palette.text.primary,
+          },
+          "&.Mui-selected:hover": {
+            backgroundColor: theme.vars.palette.action.selected,
+          },
+        }),
+      },
     },
     MuiCssBaseline: {
       styleOverrides: {
         body: {
           backgroundImage:
-            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.12), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.10), transparent 45%)",
+            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.22), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.16), transparent 55%)",
           backgroundAttachment: "fixed",
           minHeight: "100vh",
         },
