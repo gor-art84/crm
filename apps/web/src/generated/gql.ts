@@ -18,7 +18,7 @@ type Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      firstName\n      lastName\n      email\n      role\n    }\n  }\n": typeof types.MeDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": typeof types.GetUsersDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": typeof types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": typeof types.DeactivateUserDocument,
     "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": typeof types.ActivateUserDocument,
@@ -28,7 +28,7 @@ const documents: Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      firstName\n      lastName\n      email\n      role\n    }\n  }\n": types.MeDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": types.GetUsersDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": types.DeactivateUserDocument,
     "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n": types.ActivateUserDocument,
@@ -67,7 +67,7 @@ export function gql(source: "\n  query Me {\n    me {\n      id\n      firstName
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
