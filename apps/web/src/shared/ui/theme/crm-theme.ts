@@ -136,17 +136,28 @@ export const crmTheme = createTheme({
             borderRadius: 20,
             boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
             "@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
-              backgroundColor: "rgba(255, 255, 255, 0.6)",
-              backdropFilter: "blur(24px) saturate(170%)",
-              WebkitBackdropFilter: "blur(24px) saturate(170%)",
+              backgroundColor: "rgba(255, 255, 255, 0.4)",
+              backgroundImage:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.6)",
+              boxShadow: [
+                "inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+                "inset 0 -1px 0 rgba(255, 255, 255, 0.3)",
+                "0 0 0 1px rgba(17, 19, 24, 0.06)",
+                "0 8px 32px rgba(17, 19, 24, 0.08)",
+              ].join(", "),
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
             },
             "@media (prefers-reduced-transparency: reduce)": {
               backgroundColor: theme.vars.palette.background.paper,
+              backgroundImage: "none",
               backdropFilter: "none",
               WebkitBackdropFilter: "none",
             },
             "@media (prefers-contrast: more)": {
               backgroundColor: theme.vars.palette.background.paper,
+              backgroundImage: "none",
               backdropFilter: "none",
               WebkitBackdropFilter: "none",
               border: `1px solid ${theme.vars.palette.text.secondary}`,
