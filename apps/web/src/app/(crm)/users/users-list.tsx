@@ -6,17 +6,20 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ME } from "@/shared/api/graphql/me";
 import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
-import { CreateUserDrawer } from "./create-user-drawer";
 import {
   filterUsers,
   parseUsersFilters,
   type UsersFiltersType,
   usersFiltersToSearchParams,
 } from "./filter-users";
+import { UserFormDrawer } from "./user-form-drawer";
+import type { UserRow } from "./user-row";
 import { UsersFilters } from "./users-filters";
 import { UsersTable } from "./users-table";
 
 const SKELETON_ROWS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
+
+type DrawerState = { type: "closed" } | { type: "create" } | { type: "edit"; user: UserRow };
 
 export const UsersList = () => {
   const { data, loading, error } = useQuery(GET_USERS);
@@ -31,8 +34,7 @@ export const UsersList = () => {
   });
 
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
-
-  const [open, setOpen] = useState(false);
+  const [drawer, setDrawer] = useState<DrawerState>({ type: "closed" });
 
   const pathName = usePathname();
   const router = useRouter();
@@ -95,7 +97,7 @@ export const UsersList = () => {
             ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
             : `Всего: ${data.users.length}`}
         </Typography>
-        <Button variant="contained" size="small" onClick={() => setOpen(true)}>
+        <Button variant="contained" size="small" onClick={() => setDrawer({ type: "create" })}>
           Добавить пользователя
         </Button>
       </Stack>
@@ -125,9 +127,14 @@ export const UsersList = () => {
           onActivate={handleActivate}
           currentUserId={meData?.me?.id}
           pendingUserId={pendingUserId}
+          onEdit={(user) => setDrawer({ type: "edit", user })}
         />
       )}
-      <CreateUserDrawer open={open} onClose={() => setOpen(false)} />
+      <UserFormDrawer
+        user={drawer.type === "edit" ? drawer.user : null}
+        open={drawer.type !== "closed"}
+        onClose={() => setDrawer({ type: "closed" })}
+      />
     </Stack>
   );
 };

@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  IconButton,
   Paper,
   Stack,
   Table,
@@ -12,9 +13,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { EditIcon } from "lucide-react";
 import type { GetUsersQuery } from "@/generated/graphql";
 import { formatFullName, getInitials } from "@/shared/lib/person-name";
 import { ROLE_LABELS } from "@/shared/model/roles";
+import type { UserRow } from "./user-row";
 import { UserStatusChip } from "./user-status-chip";
 
 type UsersTableProps = {
@@ -23,6 +26,7 @@ type UsersTableProps = {
   pendingUserId: string | null;
   onActivate: (userId: string) => void;
   onDeactivate: (userId: string) => void;
+  onEdit: (user: UserRow) => void;
 };
 
 export const UsersTable = ({
@@ -31,6 +35,7 @@ export const UsersTable = ({
   pendingUserId,
   onActivate,
   onDeactivate,
+  onEdit,
 }: UsersTableProps) => {
   return (
     <TableContainer component={Paper}>
@@ -110,31 +115,44 @@ export const UsersTable = ({
                   <UserStatusChip isActive={user.isActive} />
                 </TableCell>
                 <TableCell align="right">
-                  {isCurrentUser ? (
-                    <Typography variant="caption" color="text.secondary">
-                      Это вы
-                    </Typography>
-                  ) : user.isActive ? (
-                    <Button
+                  <Stack
+                    direction="row"
+                    sx={{ gap: 0.5, alignItems: "center", justifyContent: "flex-end" }}
+                  >
+                    <IconButton
+                      aria-label="Изменить пользователя"
                       size="small"
-                      variant="text"
                       color="inherit"
-                      disabled={isPendingUser}
-                      onClick={() => onDeactivate(user.id)}
+                      onClick={() => onEdit(user)}
                     >
-                      Отключить
-                    </Button>
-                  ) : (
-                    <Button
-                      size="small"
-                      variant="text"
-                      color="inherit"
-                      disabled={isPendingUser}
-                      onClick={() => onActivate(user.id)}
-                    >
-                      Включить
-                    </Button>
-                  )}
+                      <EditIcon size={14} strokeWidth={1.5} />
+                    </IconButton>
+                    {isCurrentUser ? (
+                      <Typography variant="caption" color="text.secondary">
+                        Это вы
+                      </Typography>
+                    ) : user.isActive ? (
+                      <Button
+                        size="small"
+                        variant="text"
+                        color="inherit"
+                        disabled={isPendingUser}
+                        onClick={() => onDeactivate(user.id)}
+                      >
+                        Отключить
+                      </Button>
+                    ) : (
+                      <Button
+                        size="small"
+                        variant="text"
+                        color="inherit"
+                        disabled={isPendingUser}
+                        onClick={() => onActivate(user.id)}
+                      >
+                        Включить
+                      </Button>
+                    )}
+                  </Stack>
                 </TableCell>
               </TableRow>
             );
