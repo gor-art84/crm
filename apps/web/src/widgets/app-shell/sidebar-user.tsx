@@ -16,11 +16,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LOGOUT } from "@/shared/api/graphql/logout";
 import { ME } from "@/shared/api/graphql/me";
+import { getInitials } from "@/shared/lib/person-name";
 import { ROLE_LABELS } from "@/shared/model/roles";
-
-const getInitials = (firstName: string, lastName: string) => {
-  return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
-};
 
 export const SidebarUser = () => {
   const { data, loading } = useQuery(ME);

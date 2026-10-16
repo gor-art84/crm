@@ -200,5 +200,34 @@ export const crmTheme = createTheme({
         },
       },
     },
+    MuiTableCell: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderBottom: `1px solid ${theme.vars.palette.divider}`,
+          paddingBlock: 10,
+          paddingInline: 16,
+          fontSize: "0.875rem",
+        }),
+        head: ({ theme }) => ({
+          fontSize: "0.75rem",
+          fontWeight: 500,
+          color: theme.vars.palette.text.secondary,
+          backgroundColor: theme.vars.palette.grey[50],
+          whiteSpace: "nowrap",
+        }),
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&:last-child td": {
+            borderBottom: 0,
+          },
+          "&.MuiTableRow-hover:hover": {
+            backgroundColor: theme.vars.palette.action.hover,
+          },
+        }),
+      },
+    },
   },
 });

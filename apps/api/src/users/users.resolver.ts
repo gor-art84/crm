@@ -51,7 +51,7 @@ export class UsersResolver {
   @Permissions(Permission.USERS_WRITE)
   async updateUser(
     @Args("userId") userId: string,
-    @Args("input") updateUserInput: UpdateUserInput,
+    @Args("updateUserInput") updateUserInput: UpdateUserInput,
   ) {
     return this.usersService.update(userId, updateUserInput);
   }

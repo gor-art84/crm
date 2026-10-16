@@ -8,6 +8,7 @@ export const GET_USERS = gql(`
       firstName
       middleName
       lastName
+      phone
       role
       isActive
     }
@@ -22,6 +23,7 @@ export const CREATE_USER = gql(`
       firstName
       middleName
       lastName
+      phone
       role
       isActive
     }
@@ -36,6 +38,7 @@ export const DEACTIVATE_USER = gql(`
       firstName
       middleName
       lastName
+      phone
       role
       isActive
     }
@@ -50,6 +53,22 @@ export const ACTIVATE_USER = gql(`
       firstName
       middleName
       lastName
+      phone
+      role
+      isActive
+    }
+  }
+`);
+
+export const UPDATE_USER = gql(`
+  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {
+    updateUser(userId: $userId, updateUserInput: $updateUserInput) {
+      id
+      email
+      firstName
+      middleName
+      lastName
+      phone
       role
       isActive
     }
