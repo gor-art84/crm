@@ -16,6 +16,7 @@ import {
 import { EditIcon } from "lucide-react";
 import type { GetUsersQuery } from "@/generated/graphql";
 import { formatFullName, getInitials } from "@/shared/lib/person-name";
+import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
 import type { UserRow } from "./user-row";
 import { UserStatusChip } from "./user-status-chip";
@@ -104,7 +105,7 @@ export const UsersTable = ({
                 <TableCell>{ROLE_LABELS[user.role]}</TableCell>
                 <TableCell sx={{ fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
                   {user.phone ? (
-                    user.phone
+                    formatRuPhoneMask(user.phone)
                   ) : (
                     <Typography component="span" color="text.disabled">
                       —
