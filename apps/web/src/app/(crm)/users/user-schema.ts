@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeRuPhone } from "@/shared/lib/phone-ru";
 
 export const userProfileFields = z.object({
   email: z.email({ message: "Email не валидный" }),
@@ -6,7 +7,23 @@ export const userProfileFields = z.object({
   lastName: z.string().min(1, { message: "Фамилия должна быть не пустой" }),
   middleName: z.string(),
   role: z.enum(["ADMINISTRATOR", "METHODIST", "MANAGER"]),
-  phone: z.string(),
+  phone: z
+    .string()
+    .trim()
+    .superRefine((value, ctx) => {
+      if (value === "") return;
+      if (!normalizeRuPhone(value)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Номер телефона не валидный",
+        });
+      }
+    })
+    .transform((value) => {
+      if (value === "") return "";
+      // сюда дойдём только если superRefine прошёл
+      return normalizeRuPhone(value) ?? "";
+    }),
 });
 
 export const createUserSchema = userProfileFields.extend({
