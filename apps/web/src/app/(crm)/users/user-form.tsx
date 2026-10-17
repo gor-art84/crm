@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { CREATE_USER, GET_USERS, UPDATE_USER } from "@/shared/api/graphql/users";
+import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
 import type { UserRow } from "./user-row";
 import { type CreateUserSchema, createUserSchema, editUserSchema } from "./user-schema";
@@ -29,7 +30,7 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       firstName: user?.firstName ?? "",
       middleName: user?.middleName ?? "",
       lastName: user?.lastName ?? "",
-      phone: user?.phone ?? "",
+      phone: user?.phone ? formatRuPhoneMask(user.phone) : "",
       role: user?.role ?? "MANAGER",
     },
   });
@@ -48,7 +49,7 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               middleName: values.middleName?.trim() || null,
               lastName: values.lastName,
               role: values.role,
-              phone: values.phone?.trim() || null,
+              phone: values.phone || null,
             },
           },
           refetchQueries: [{ query: GET_USERS }],
@@ -68,7 +69,7 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               middleName: values.middleName?.trim() || undefined,
               lastName: values.lastName,
               role: values.role,
-              phone: values.phone?.trim() || undefined,
+              phone: values.phone || undefined,
             },
           },
           refetchQueries: [{ query: GET_USERS }],
@@ -196,10 +197,17 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               {...field}
               label="Телефон"
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="+7 (900) 123-45-67"
               size="small"
               fullWidth
               error={Boolean(fieldState.error)}
-              helperText={fieldState.error?.message}
+              helperText={fieldState.error?.message ?? "Можно не указывать"}
+              onBlur={field.onBlur}
+              onChange={(e) => {
+                field.onChange(formatRuPhoneMask(e.target.value));
+              }}
             />
           )}
         />
