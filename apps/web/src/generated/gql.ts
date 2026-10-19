@@ -14,6 +14,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": typeof types.FioSuggestionsDocument,
+    "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": typeof types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": typeof types.HelloDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -25,6 +27,8 @@ type Documents = {
     "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.UpdateUserDocument,
 };
 const documents: Documents = {
+    "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": types.FioSuggestionsDocument,
+    "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": types.HelloDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -50,6 +54,14 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  "): (typeof documents)["\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  "];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n"): (typeof documents)["\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

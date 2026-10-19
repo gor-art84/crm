@@ -18,8 +18,11 @@ export const envSchema = z
     REDIS_URL: z.url(),
     // =============================== Dadata API =================================
     DADATA_API_KEY: z.string().min(1),
+    DADATA_SECRET_KEY: z.string().min(1),
     DADATA_TTL_SECONDS: z.coerce.number().int().min(1),
     DADATA_SUGGESTIONS_URL: z.url(),
+    DADATA_SUGGESTIONS_FIO: z.url(),
+    DADATA_CLEAN_NAME: z.url(),
   })
   .refine((data) => data.SESSION_IDLE_TIMEOUT_SECONDS <= data.SESSION_ABSOLUTE_TIMEOUT_SECONDS, {
     message:

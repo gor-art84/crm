@@ -1,7 +1,9 @@
 import { PartyStatus } from "../generated/prisma/enums.js";
 
-export type DadataParty = {
-  suggestions: {
+export interface DadataParty {
+  suggestions: Array<{
+    value: string;
+    unrestricted_value: string;
     data: {
       kpp: string | null;
       management: {
@@ -30,5 +32,5 @@ export type DadataParty = {
       phones: { value: string }[] | null;
       employee_count: number | null;
     };
-  }[];
-};
+  }>;
+}
