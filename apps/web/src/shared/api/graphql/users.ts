@@ -11,6 +11,11 @@ export const GET_USERS = gql(`
       phone
       avatarUrl
       role
+      birthDate
+      jobTitle
+      telegram
+      whatsapp
+      maxAccount
       isActive
     }
   }
@@ -27,6 +32,11 @@ export const CREATE_USER = gql(`
       phone
       avatarUrl
       role
+      birthDate
+      jobTitle
+      telegram
+      whatsapp
+      maxAccount
       isActive
     }
   }
@@ -43,6 +53,11 @@ export const DEACTIVATE_USER = gql(`
       phone
       avatarUrl
       role
+      birthDate
+      jobTitle
+      telegram
+      whatsapp
+      maxAccount
       isActive
     }
   }
@@ -59,6 +74,11 @@ export const ACTIVATE_USER = gql(`
       phone
       avatarUrl
       role
+      birthDate
+      jobTitle
+      telegram
+      whatsapp
+      maxAccount
       isActive
     }
   }
@@ -75,6 +95,11 @@ export const UPDATE_USER = gql(`
       phone
       avatarUrl
       role
+      birthDate
+      jobTitle
+      telegram
+      whatsapp
+      maxAccount
       isActive
     }
   }

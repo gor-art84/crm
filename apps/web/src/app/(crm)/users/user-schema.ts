@@ -24,6 +24,11 @@ export const userProfileFields = z.object({
       // сюда дойдём только если superRefine прошёл
       return normalizeRuPhone(value) ?? "";
     }),
+  birthDate: z.string(),
+  jobTitle: z.string(),
+  telegram: z.string(),
+  whatsapp: z.string(),
+  maxAccount: z.string(),
 });
 
 export const createUserSchema = userProfileFields.extend({

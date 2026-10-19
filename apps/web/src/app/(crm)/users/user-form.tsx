@@ -3,10 +3,13 @@
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Avatar, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CREATE_USER, GET_USERS, UPDATE_USER } from "@/shared/api/graphql/users";
 import { uploadUserAvatar } from "@/shared/api/upload-user-avatar";
+import { toDateInputValue, toDayjs } from "@/shared/lib/date-ru";
 import { formatFullName, getInitials } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
@@ -54,6 +57,11 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       lastName: user?.lastName ?? "",
       phone: user?.phone ? formatRuPhoneMask(user.phone) : "",
       role: user?.role ?? "MANAGER",
+      birthDate: toDateInputValue(user?.birthDate),
+      jobTitle: user?.jobTitle ?? "",
+      telegram: user?.telegram ?? "",
+      whatsapp: user?.whatsapp ?? "",
+      maxAccount: user?.maxAccount ?? "",
     },
   });
 
@@ -115,6 +123,11 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               lastName: values.lastName,
               role: values.role,
               phone: values.phone || null,
+              birthDate: values.birthDate || null,
+              jobTitle: values.jobTitle.trim() || null,
+              telegram: values.telegram?.trim() || null,
+              whatsapp: values.whatsapp?.trim() || null,
+              maxAccount: values.maxAccount.trim() || null,
             },
           },
           refetchQueries: [{ query: GET_USERS }],
@@ -135,6 +148,11 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               lastName: values.lastName,
               role: values.role,
               phone: values.phone || undefined,
+              birthDate: values.birthDate || undefined,
+              jobTitle: values.jobTitle.trim() || undefined,
+              telegram: values.telegram?.trim() || undefined,
+              whatsapp: values.whatsapp?.trim() || undefined,
+              maxAccount: values.maxAccount.trim() || undefined,
             },
           },
           refetchQueries: [{ query: GET_USERS }],
@@ -341,6 +359,95 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
               onChange={(e) => {
                 field.onChange(formatRuPhoneMask(e.target.value));
               }}
+            />
+          )}
+        />
+        <Controller
+          name="birthDate"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <DatePicker
+              label="Дата рождения"
+              disableFuture
+              format="DD.MM.YYYY"
+              value={toDayjs(field.value)}
+              minDate={dayjs("1900-01-01")}
+              onChange={(value) => {
+                field.onChange(value?.isValid() ? value.format("YYYY-MM-DD") : "");
+              }}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  fullWidth: true,
+                  error: Boolean(fieldState.error),
+                  helperText: fieldState.error?.message ?? "Можно не указывать",
+                  onBlur: field.onBlur,
+                },
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="jobTitle"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label="Должность"
+              type="text"
+              size="small"
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? "Можно не указывать"}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+        <Controller
+          name="whatsapp"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label="WhatsApp"
+              type="text"
+              size="small"
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? "Можно не указывать"}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+        <Controller
+          name="telegram"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label="Telegram"
+              type="text"
+              size="small"
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? "Можно не указывать"}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+        <Controller
+          name="maxAccount"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label="Max"
+              type="text"
+              size="small"
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? "Можно не указывать"}
+              onBlur={field.onBlur}
             />
           )}
         />
