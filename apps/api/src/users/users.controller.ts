@@ -12,7 +12,7 @@ export class UsersController {
   @Post(":id/avatar")
   @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.USERS_WRITE)
-  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: 2 * 1024 * 1024 } }))
+  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: 10 * 1024 * 1024 } }))
   uploadAvatar(@Param("id") userId: string, @UploadedFile() file: Express.Multer.File | undefined) {
     return this.usersService.uploadAvatar(userId, file);
   }

@@ -12,6 +12,7 @@ import argon2 from "argon2";
 import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
 import { Prisma, Role } from "../generated/prisma/client.js";
+import { ImageProcessingService } from "../images/image-processing.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
@@ -43,6 +44,7 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly sessionsService: SessionsService,
     @Inject(OBJECT_STORAGE) private readonly storage: ObjectStorage,
+    private readonly imageProcessingService: ImageProcessingService,
   ) {}
 
   private static readonly AVATAR_MIME: Record<string, string> = {
@@ -222,23 +224,22 @@ export class UsersService {
     file: Express.Multer.File | undefined,
   ): Promise<{ avatarUrl: string }> {
     if (!file) throw new BadRequestException("Файл не предоставлен");
-
-    const ext = UsersService.AVATAR_MIME[file.mimetype];
-    if (!ext)
+    if (!UsersService.AVATAR_MIME[file.mimetype])
       throw new BadRequestException(
-        "Неподдерживаемый формат файла. Поддерживаются только JPEG, PNG и WebP.",
+        "Недопустимый формат файла. Допустимые форматы: png, jpeg, jpg.",
       );
+    if (file.size > 10 * 1024 * 1024)
+      throw new BadRequestException("Файл слишком большой. Максимальный размер: 10 MB.");
 
-    if (file.size > 2 * 1024 * 1024)
-      throw new BadRequestException("Файл слишком большой. Максимальный размер: 2MB.");
+    const processed = await this.imageProcessingService.processImage(file.buffer, "avatar");
 
     const user = await this.requireUser(userId);
-    const key = `avatars/${userId}/${randomUUID()}.${ext}`;
+    const key = `avatars/${userId}/${randomUUID()}.${processed.extension}`;
 
     await this.storage.put({
       key,
-      body: file.buffer,
-      contentType: file.mimetype,
+      body: processed.buffer,
+      contentType: processed.contentType,
     });
 
     await this.prisma.user.update({

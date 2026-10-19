@@ -20,11 +20,11 @@ type Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      firstName\n      lastName\n      email\n      role\n    }\n  }\n": typeof types.MeDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.GetUsersDocument,
-    "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.CreateUserDocument,
-    "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.DeactivateUserDocument,
-    "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.ActivateUserDocument,
-    "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": typeof types.UpdateUserDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": typeof types.GetUsersDocument,
+    "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": typeof types.CreateUserDocument,
+    "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": typeof types.DeactivateUserDocument,
+    "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": typeof types.ActivateUserDocument,
+    "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": typeof types.UpdateUserDocument,
 };
 const documents: Documents = {
     "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": types.FioSuggestionsDocument,
@@ -33,11 +33,11 @@ const documents: Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      firstName\n      lastName\n      email\n      role\n    }\n  }\n": types.MeDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.GetUsersDocument,
-    "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.CreateUserDocument,
-    "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.DeactivateUserDocument,
-    "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.ActivateUserDocument,
-    "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n": types.UpdateUserDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": types.GetUsersDocument,
+    "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": types.CreateUserDocument,
+    "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": types.DeactivateUserDocument,
+    "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": types.ActivateUserDocument,
+    "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n": types.UpdateUserDocument,
 };
 
 /**
@@ -81,23 +81,23 @@ export function gql(source: "\n  query Me {\n    me {\n      id\n      firstName
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      role\n      isActive\n    }\n  }\n"];
+export function gql(source: "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      isActive\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

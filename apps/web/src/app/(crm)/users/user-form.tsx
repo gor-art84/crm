@@ -1,11 +1,13 @@
 "use client";
 
-import { useMutation } from "@apollo/client/react";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { Alert, Avatar, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CREATE_USER, GET_USERS, UPDATE_USER } from "@/shared/api/graphql/users";
-import { formatFullName } from "@/shared/lib/person-name";
+import { uploadUserAvatar } from "@/shared/api/upload-user-avatar";
+import { formatFullName, getInitials } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
 import { useFioSuggest } from "./use-fio-suggest";
@@ -31,6 +33,12 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
           })
         : "",
     );
+
+  const client = useApolloClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatarUrl ?? null);
+  const [avatarErr, setAvatarErr] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState<boolean>(false);
 
   const isEdit = Boolean(user);
 
@@ -62,6 +70,34 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       shouldDirty: true,
     });
     if (parts.value) setFioInput(parts.value);
+  };
+
+  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+
+    const allowed = new Set(["image/png", "image/jpeg", "image/webp"]);
+    if (!allowed.has(file.type)) {
+      setAvatarErr("Недопустимый формат файла. Допустимые форматы: png, jpeg, webp.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setAvatarErr("Файл слишком большой. Максимальный размер: 10 MB.");
+      return;
+    }
+
+    setAvatarErr(null);
+    setAvatarUploading(true);
+    try {
+      const { avatarUrl } = await uploadUserAvatar(user.id, file);
+      setAvatarPreview(avatarUrl);
+      await client.refetchQueries({ include: [GET_USERS] });
+    } catch (err) {
+      setAvatarErr(err instanceof Error ? err.message : "Ошибка при загрузке аватара");
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -119,6 +155,40 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       {(errorCreate ?? errorUpdate) && (
         <Alert severity="error">{errorCreate?.message ?? errorUpdate?.message}</Alert>
       )}
+      {isEdit && user && (
+        <Stack direction="row" sx={{ gap: 2, alignItems: "center" }}>
+          <Avatar
+            src={avatarPreview ?? undefined}
+            sx={{ width: 64, height: 64, fontSize: 20, fontWeight: 600 }}
+          >
+            {getInitials(user.firstName, user.lastName)}
+          </Avatar>
+          <Stack sx={{ gap: 1 }}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              hidden
+              onChange={onAvatarChange}
+            />
+            <Button
+              type="button"
+              variant="outlined"
+              size="small"
+              disabled={avatarUploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {avatarUploading ? "Загрузка…" : "Загрузить фото"}
+            </Button>
+            {avatarErr && (
+              <Alert severity="error" sx={{ py: 0 }}>
+                {avatarErr}
+              </Alert>
+            )}
+          </Stack>
+        </Stack>
+      )}
+
       <Stack sx={{ flex: 1, gap: 2 }}>
         <Controller
           name="email"
