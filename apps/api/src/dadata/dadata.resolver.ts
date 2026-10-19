@@ -1,8 +1,8 @@
 import { UseGuards } from "@nestjs/common";
 import { Args, Int, Query, Resolver } from "@nestjs/graphql";
 import { Permissions } from "../auth/decorators/permissions.decorator.js";
-import { GqlAuthGuard } from "../auth/guards/gql-auth.guard.js";
 import { PermissionsGuard } from "../auth/guards/permissions.guard.js";
+import { SessionAuthGuard } from "../auth/guards/session-auth.guard.js";
 import { Permission } from "../generated/prisma/enums.js";
 import { DadataService } from "./dadata.service.js";
 import { FioCleanResult } from "./dto/fio-clean-result.object.js";
@@ -13,7 +13,7 @@ export class DadataResolver {
   constructor(private readonly dadataService: DadataService) {}
 
   @Query(() => [FioSuggestionObject])
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.USERS_WRITE)
   async fioSuggestions(
     @Args("query") query: string,
@@ -23,7 +23,7 @@ export class DadataResolver {
   }
 
   @Query(() => FioCleanResult)
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.USERS_WRITE)
   async cleanFio(@Args("query") query: string): Promise<FioCleanResult> {
     return await this.dadataService.cleanFio(query);

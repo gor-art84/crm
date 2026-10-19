@@ -6,10 +6,9 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { GqlExecutionContext } from "@nestjs/graphql";
 import { Permission } from "../../generated/prisma/enums.js";
 import { PERMISSIONS_KEYS } from "../decorators/permissions.decorator.js";
-import { GqlContext } from "../gql-context.js";
+import { getRequest } from "../get-request.js";
 import { PermissionsService } from "../permissions.service.js";
 
 @Injectable()
@@ -29,7 +28,7 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    const request: GqlContext["req"] = GqlExecutionContext.create(context).getContext().req;
+    const request = getRequest(context);
     const userId = request.session?.userId;
     if (!userId) {
       throw new UnauthorizedException("Unauthorized");

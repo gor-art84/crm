@@ -84,6 +84,7 @@ export const UsersTable = ({
                         backgroundColor: "grey.200",
                         color: "text.primary",
                       }}
+                      src={user.avatarUrl ?? undefined}
                     >
                       {getInitials(user.firstName, user.lastName)}
                     </Avatar>

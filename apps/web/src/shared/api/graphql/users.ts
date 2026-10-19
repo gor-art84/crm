@@ -9,6 +9,7 @@ export const GET_USERS = gql(`
       middleName
       lastName
       phone
+      avatarUrl
       role
       isActive
     }
@@ -24,6 +25,7 @@ export const CREATE_USER = gql(`
       middleName
       lastName
       phone
+      avatarUrl
       role
       isActive
     }
@@ -39,6 +41,7 @@ export const DEACTIVATE_USER = gql(`
       middleName
       lastName
       phone
+      avatarUrl
       role
       isActive
     }
@@ -54,6 +57,7 @@ export const ACTIVATE_USER = gql(`
       middleName
       lastName
       phone
+      avatarUrl
       role
       isActive
     }
@@ -69,6 +73,7 @@ export const UPDATE_USER = gql(`
       middleName
       lastName
       phone
+      avatarUrl
       role
       isActive
     }
