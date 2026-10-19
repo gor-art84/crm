@@ -1,12 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { GqlExecutionContext } from "@nestjs/graphql";
 import { EnvConfig } from "../../config/env.schema.js";
-import { GqlContext } from "../gql-context.js";
+import { getRequest } from "../get-request.js";
 import { SessionsService } from "../sessions.service.js";
 
 @Injectable()
-export class GqlAuthGuard implements CanActivate {
+export class SessionAuthGuard implements CanActivate {
   constructor(
     private readonly sessionsService: SessionsService,
     private readonly configService: ConfigService<EnvConfig, true>,
@@ -16,7 +15,7 @@ export class GqlAuthGuard implements CanActivate {
     const absoluteTimeoutSeconds = this.configService.get("SESSION_ABSOLUTE_TIMEOUT_SECONDS", {
       infer: true,
     });
-    const request: GqlContext["req"] = GqlExecutionContext.create(context).getContext().req;
+    const request = getRequest(context);
     const sessionId = request.cookies[this.configService.get("COOKIE_NAME", { infer: true })];
 
     if (!sessionId) {

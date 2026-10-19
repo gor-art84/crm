@@ -1,7 +1,11 @@
+import { randomUUID } from "node:crypto";
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import argon2 from "argon2";
@@ -9,6 +13,7 @@ import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
 import { Prisma, Role } from "../generated/prisma/client.js";
 import { PrismaService } from "../prisma/prisma.service.js";
+import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
@@ -26,16 +31,25 @@ const userSelect = {
   whatsapp: true,
   maxAccount: true,
   jobTitle: true,
+  avatarKey: true,
   role: true,
   isActive: true,
 } satisfies Prisma.UserSelect;
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessionsService: SessionsService,
+    @Inject(OBJECT_STORAGE) private readonly storage: ObjectStorage,
   ) {}
+
+  private static readonly AVATAR_MIME: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  };
 
   private async requireUser(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -201,5 +215,49 @@ export class UsersService {
 
       return updatedUser;
     });
+  }
+
+  async uploadAvatar(
+    userId: string,
+    file: Express.Multer.File | undefined,
+  ): Promise<{ avatarUrl: string }> {
+    if (!file) throw new BadRequestException("Файл не предоставлен");
+
+    const ext = UsersService.AVATAR_MIME[file.mimetype];
+    if (!ext)
+      throw new BadRequestException(
+        "Неподдерживаемый формат файла. Поддерживаются только JPEG, PNG и WebP.",
+      );
+
+    if (file.size > 2 * 1024 * 1024)
+      throw new BadRequestException("Файл слишком большой. Максимальный размер: 2MB.");
+
+    const user = await this.requireUser(userId);
+    const key = `avatars/${userId}/${randomUUID()}.${ext}`;
+
+    await this.storage.put({
+      key,
+      body: file.buffer,
+      contentType: file.mimetype,
+    });
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarKey: key },
+    });
+
+    if (user.avatarKey) {
+      try {
+        await this.storage.delete(user.avatarKey);
+      } catch (error) {
+        this.logger.error(`Failed to delete old avatar: ${error}`);
+      }
+    }
+    return { avatarUrl: this.storage.getPublicUrl(key) };
+  }
+
+  getAvatarUrl(avatarKey: string | null | undefined): string | null {
+    if (!avatarKey) return null;
+    return this.storage.getPublicUrl(avatarKey);
   }
 }

@@ -42,6 +42,9 @@ export class UserObject {
   @Field(() => String, { nullable: true })
   jobTitle: string | null;
 
+  @Field(() => String, { nullable: true })
+  avatarUrl?: string | null;
+
   @Field(() => Date, { nullable: true })
   createdAt?: Date | null;
 

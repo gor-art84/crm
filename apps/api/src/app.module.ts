@@ -12,6 +12,7 @@ import { envSchema } from "./config/env.schema.js";
 import { DadataModule } from "./dadata/dadata.module.js";
 import { PrismaModule } from "./prisma/prisma.module.js";
 import { RedisModule } from "./redis/redis.module.js";
+import { StorageModule } from "./storage/storage.module.js";
 import { UsersModule } from "./users/users.module.js";
 
 @Module({
@@ -29,6 +30,7 @@ import { UsersModule } from "./users/users.module.js";
     }),
     PrismaModule,
     RedisModule,
+    StorageModule,
     AuthModule,
     UsersModule,
     DadataModule,

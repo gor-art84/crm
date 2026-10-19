@@ -6,7 +6,7 @@ import { AuthService } from "./auth.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
 import { LoginInput } from "./dto/login.input.dto.js";
 import { type GqlContext } from "./gql-context.js";
-import { GqlAuthGuard } from "./guards/gql-auth.guard.js";
+import { SessionAuthGuard } from "./guards/session-auth.guard.js";
 import { sessionCookieOptions } from "./session.js";
 
 @Resolver()
@@ -31,7 +31,7 @@ export class AuthResolver {
     return payload;
   }
 
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(SessionAuthGuard)
   @Query(() => AuthPayload)
   async me(@Context() context: GqlContext): Promise<AuthPayload> {
     const userId = context.req.session?.userId;

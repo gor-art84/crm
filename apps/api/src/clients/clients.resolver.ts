@@ -1,8 +1,8 @@
 import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Permissions } from "../auth/decorators/permissions.decorator.js";
-import { GqlAuthGuard } from "../auth/guards/gql-auth.guard.js";
 import { PermissionsGuard } from "../auth/guards/permissions.guard.js";
+import { SessionAuthGuard } from "../auth/guards/session-auth.guard.js";
 import { DadataService } from "../dadata/dadata.service.js";
 import { Permission } from "../generated/prisma/enums.js";
 import { ClientsService } from "./clients.service.js";
@@ -18,28 +18,28 @@ export class ClientsResolver {
     private readonly dadataService: DadataService,
   ) {}
 
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.CLIENTS_READ)
   @Query(() => [PartyObject])
   async partyByInn(@Args("inn") inn: string) {
     return this.dadataService.findPartyByInn(inn);
   }
 
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.CLIENTS_WRITE)
   @Mutation(() => ClientObject)
   async createClient(@Args("createClientInput") createClientInput: CreateClientInput) {
     return this.clientsService.createClient(createClientInput);
   }
 
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.CLIENTS_READ)
   @Query(() => [ClientObject])
   async clients() {
     return this.clientsService.findMany();
   }
 
-  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.CLIENTS_READ)
   @Query(() => ClientLookupObject)
   async lookup(@Args("inn") inn: string) {
