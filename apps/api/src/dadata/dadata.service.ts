@@ -5,6 +5,12 @@ import { trimInn } from "../common/trim-inn.js";
 import { EnvConfig } from "../config/env.schema.js";
 import { ClientType } from "../generated/prisma/enums.js";
 import { RedisService } from "../redis/redis.service.js";
+import {
+  DadataFioCleanInterface,
+  DadataFioSuggestion,
+  FioCleanResult,
+  FioSuggestion,
+} from "./dadata-fio.js";
 import { DadataParty } from "./dadata-party.js";
 import { PartyPreview } from "./party-preview.js";
 
@@ -52,15 +58,19 @@ export class DadataService {
     return this.getPartyPreview({ suggestions: [suggestion] })[0] ?? null;
   }
 
-  private requestInit(body: unknown) {
+  private requestInit(body: unknown, withSecret?: boolean) {
     const apiKey = this.configService.get("DADATA_API_KEY", { infer: true });
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Token ${apiKey}`,
+    };
+    if (withSecret) {
+      headers["X-Secret"] = this.configService.get("DADATA_SECRET_KEY", { infer: true });
+    }
     return {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Token ${apiKey}`,
-      },
+      headers: headers,
       body: JSON.stringify(body),
     };
   }
@@ -69,7 +79,7 @@ export class DadataService {
     const cachedData = await this.redisService.get(`dadata:party:${inn}`);
     if (!cachedData) {
       const suggestionsUrl = this.configService.get("DADATA_SUGGESTIONS_URL", { infer: true });
-      const response = await fetch(suggestionsUrl, this.requestInit({ query: inn }));
+      const response = await fetch(suggestionsUrl, this.requestInit({ query: inn }, false));
       if (!response.ok) {
         throw new BadGatewayException("Failed to fetch party");
       }
@@ -120,5 +130,73 @@ export class DadataService {
       }
       throw error;
     }
+  }
+
+  async suggestFio(query: string, count = 7): Promise<FioSuggestion[]> {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < 2) return [];
+    const cacheKey = `dadata:fio:suggest:${trimmedQuery.toLowerCase()}`;
+    const cachedData = await this.redisService.get(cacheKey);
+    if (cachedData) return JSON.parse(cachedData);
+
+    const response = await fetch(
+      this.configService.get("DADATA_SUGGESTIONS_FIO", { infer: true }),
+      this.requestInit({ query: trimmedQuery, count }, false),
+    );
+
+    if (!response.ok) {
+      throw new BadGatewayException("Failed to fetch FIO suggestions");
+    }
+
+    const data = (await response.json()) as DadataFioSuggestion;
+    const suggestions: FioSuggestion[] = data.suggestions.map((s) => ({
+      value: s.value,
+      surname: s.data.surname,
+      name: s.data.name ?? null,
+      patronymic: s.data.patronymic,
+    }));
+    await this.redisService.set(
+      cacheKey,
+      JSON.stringify(suggestions),
+      this.configService.get("DADATA_TTL_SECONDS", { infer: true }),
+    );
+    return suggestions;
+  }
+
+  async cleanFio(query: string): Promise<FioCleanResult> {
+    const trimmed = query.trim();
+    if (!trimmed) throw new BadRequestException("FIO query is empty");
+
+    const cacheKey = `dadata:fio:clean:${trimmed.toLowerCase()}`;
+    const cached = await this.redisService.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+
+    const response = await fetch(
+      this.configService.get("DADATA_CLEAN_NAME", { infer: true }),
+      this.requestInit([trimmed], true), // массив + secret
+    );
+    if (!response.ok) {
+      throw new BadGatewayException("Failed to clean FIO");
+    }
+
+    const data = (await response.json()) as DadataFioCleanInterface[];
+    const item = data[0];
+    if (!item) throw new BadRequestException("FIO clean result is empty");
+
+    const result: FioCleanResult = {
+      result: item.result,
+      surname: item.surname,
+      name: item.name,
+      patronymic: item.patronymic,
+      gender: item.gender,
+      qc: item.qc,
+    };
+
+    await this.redisService.set(
+      cacheKey,
+      JSON.stringify(result),
+      this.configService.get("DADATA_TTL_SECONDS", { infer: true }),
+    );
+    return result;
   }
 }

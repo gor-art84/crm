@@ -5,8 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { CREATE_USER, GET_USERS, UPDATE_USER } from "@/shared/api/graphql/users";
+import { formatFullName } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
+import { useFioSuggest } from "./use-fio-suggest";
+import { UserFioAutocomplete } from "./user-fio-autocomplete";
 import type { UserRow } from "./user-row";
 import { type CreateUserSchema, createUserSchema, editUserSchema } from "./user-schema";
 
@@ -18,6 +21,17 @@ type UserFormProps = {
 export const UserForm = ({ user, onClose }: UserFormProps) => {
   const [createUser, { loading: loadingCreate, error: errorCreate }] = useMutation(CREATE_USER);
   const [updateUser, { loading: loadingUpdate, error: errorUpdate }] = useMutation(UPDATE_USER);
+  const { fioOptions, fioInput, setFioInput, fioLoading, cleanFioLoading, runCleanFio } =
+    useFioSuggest(
+      user
+        ? formatFullName({
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+          })
+        : "",
+    );
+
   const isEdit = Boolean(user);
 
   const loading = loadingCreate || loadingUpdate;
@@ -34,6 +48,21 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       role: user?.role ?? "MANAGER",
     },
   });
+
+  const applyFioParts = (parts: {
+    surname?: string | null;
+    name?: string | null;
+    patronymic?: string | null;
+    value?: string | null;
+  }) => {
+    form.setValue("lastName", parts.surname ?? "", { shouldValidate: true, shouldDirty: true });
+    form.setValue("firstName", parts.name ?? "", { shouldValidate: true, shouldDirty: true });
+    form.setValue("middleName", parts.patronymic ?? "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    if (parts.value) setFioInput(parts.value);
+  };
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (isEdit) {
@@ -125,6 +154,40 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
             )}
           />
         )}
+
+        <UserFioAutocomplete
+          value={fioInput}
+          onInputChange={setFioInput}
+          options={fioOptions}
+          loading={fioLoading}
+          onSelect={(option) => {
+            applyFioParts({
+              surname: option.surname,
+              name: option.name,
+              patronymic: option.patronymic,
+              value: option.value,
+            });
+          }}
+        />
+
+        <Button
+          type="button"
+          variant="outlined"
+          size="small"
+          disabled={cleanFioLoading || fioInput.trim().length < 2}
+          onClick={async () => {
+            const cleaned = await runCleanFio();
+            if (!cleaned) return;
+            applyFioParts({
+              surname: cleaned.surname,
+              name: cleaned.name,
+              patronymic: cleaned.patronymic,
+              value: cleaned.result,
+            });
+          }}
+        >
+          Проверить ФИО
+        </Button>
 
         <Controller
           name="lastName"
