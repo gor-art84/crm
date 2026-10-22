@@ -111,13 +111,11 @@ export class UsersService {
       select: {
         passwordHash: true,
         userInvites: {
-          where: { usedAt: null },
+          where: { usedAt: null, revokedAt: null },
           orderBy: { createdAt: "desc" },
           take: 1,
           select: {
             expiresAt: true,
-            usedAt: true,
-            createdAt: true,
           },
         },
       },
@@ -159,13 +157,11 @@ export class UsersService {
         updatedAt: true,
         passwordHash: true,
         userInvites: {
-          where: { usedAt: null },
+          where: { usedAt: null, revokedAt: null },
           orderBy: { createdAt: "desc" },
           take: 1,
           select: {
             expiresAt: true,
-            usedAt: true,
-            createdAt: true,
           },
         },
       },
