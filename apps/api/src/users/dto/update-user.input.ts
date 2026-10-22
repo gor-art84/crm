@@ -9,24 +9,25 @@ import {
   IsPhoneNumber,
   IsString,
 } from "class-validator";
+import { IsOptionalNonNull } from "../../common/is-optional-non-null.js";
 import { Permission, Role } from "../../generated/prisma/enums.js";
 
 @InputType()
 export class UpdateUserInput {
-  @IsOptional()
+  @IsOptionalNonNull()
   @IsEmail()
   @IsNotEmpty()
   @Field(() => String, { nullable: true })
   email?: string;
 
-  @IsOptional()
+  @IsOptionalNonNull()
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
   @Field(() => String, { nullable: true })
   firstName?: string;
 
-  @IsOptional()
+  @IsOptionalNonNull()
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
@@ -38,7 +39,7 @@ export class UpdateUserInput {
   @Field(() => String, { nullable: true })
   middleName?: string | null;
 
-  @IsOptional()
+  @IsOptionalNonNull()
   @IsEnum(Role)
   @Field(() => Role, { nullable: true })
   role?: Role;
@@ -47,7 +48,7 @@ export class UpdateUserInput {
   @IsDate()
   @Transform(({ value }) => (value == null ? value : new Date(value)))
   @Field(() => Date, { nullable: true })
-  birthDate?: Date;
+  birthDate?: Date | null;
 
   @IsOptional()
   @IsPhoneNumber("RU")
@@ -74,7 +75,7 @@ export class UpdateUserInput {
   @Field(() => String, { nullable: true })
   jobTitle?: string | null;
 
-  @IsOptional()
+  @IsOptionalNonNull()
   @IsEnum(Permission, { each: true })
   @Field(() => [Permission], { nullable: true })
   extraPermissions?: Permission[];
