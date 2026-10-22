@@ -3,6 +3,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from "@nes
 import { ConfigService } from "@nestjs/config";
 import * as argon2 from "argon2";
 import { EnvConfig } from "../config/env.schema.js";
+import { Prisma } from "../generated/prisma/client.js";
 import { MAIL, type Mail } from "../mail/mail.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { computeInviteStatus } from "./compute-invite-status.js";
@@ -16,22 +17,28 @@ export class InvitesService {
     @Inject(MAIL) private readonly mail: Mail,
   ) {}
 
-  async issueInvite(user: { id: string; email: string; firstName: string }): Promise<void> {
-    await this.prisma.userInvite.updateMany({
-      where: { userId: user.id, usedAt: null, revokedAt: null },
+  async createInvite(tx: Prisma.TransactionClient, userId: string): Promise<string> {
+    await tx.userInvite.updateMany({
+      where: { userId, usedAt: null, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+
     const rawToken = randomBytes(32).toString("base64url");
     const tokenHash = this.hashToken(rawToken);
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await this.prisma.userInvite.create({
+    await tx.userInvite.create({
       data: {
-        userId: user.id,
+        userId,
         tokenHash,
         expiresAt,
       },
     });
+
+    return rawToken;
+  }
+
+  async sendInvite(user: { email: string; firstName: string }, rawToken: string): Promise<void> {
     const inviteUrl = `${this.configService.get("WEB_ORIGIN", { infer: true })}/invite/${rawToken}`;
 
     await this.mail.send({
@@ -59,7 +66,10 @@ export class InvitesService {
     if (user.passwordHash !== null) {
       throw new BadRequestException("Пользователь уже активировал аккаунт");
     }
-    await this.issueInvite({ id: user.id, email: user.email, firstName: user.firstName });
+    const rawToken = await this.prisma.$transaction(async (tx) => {
+      return await this.createInvite(tx, userId);
+    });
+    await this.sendInvite({ email: user.email, firstName: user.firstName }, rawToken);
   }
 
   private hashToken(token: string): string {

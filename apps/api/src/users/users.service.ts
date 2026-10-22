@@ -188,30 +188,40 @@ export class UsersService {
     const email = createUserInput.email.toLowerCase();
     await this.assertEmailAvailable(email);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        firstName: createUserInput.firstName,
-        lastName: createUserInput.lastName,
-        middleName: emptyToNull(createUserInput.middleName),
-        birthDate: createUserInput.birthDate ?? null,
-        phone: emptyToNull(createUserInput.phone),
-        telegram: emptyToNull(createUserInput.telegram),
-        whatsapp: emptyToNull(createUserInput.whatsapp),
-        maxAccount: emptyToNull(createUserInput.maxAccount),
-        jobTitle: emptyToNull(createUserInput.jobTitle),
-        role: createUserInput.role,
-        isActive: true,
-        passwordHash: null,
-        permissions: {
-          create: permissionsBeyondRole.map((permission) => ({ permission })),
+    const { user, rawToken } = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email,
+          firstName: createUserInput.firstName,
+          lastName: createUserInput.lastName,
+          middleName: emptyToNull(createUserInput.middleName),
+          birthDate: createUserInput.birthDate ?? null,
+          phone: emptyToNull(createUserInput.phone),
+          telegram: emptyToNull(createUserInput.telegram),
+          whatsapp: emptyToNull(createUserInput.whatsapp),
+          maxAccount: emptyToNull(createUserInput.maxAccount),
+          jobTitle: emptyToNull(createUserInput.jobTitle),
+          role: createUserInput.role,
+          isActive: true,
+          passwordHash: null,
+          permissions: {
+            create: permissionsBeyondRole.map((permission) => ({ permission })),
+          },
         },
-      },
-      select: userSelect,
+        select: userSelect,
+      });
+      const rawToken = await this.invitesService.createInvite(tx, user.id);
+      return { user, rawToken };
     });
 
-    await this.invitesService.issueInvite(user);
-
+    try {
+      await this.invitesService.sendInvite(user, rawToken);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send invite for user ${user.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
     return this.toUserObject(user);
   }
 
