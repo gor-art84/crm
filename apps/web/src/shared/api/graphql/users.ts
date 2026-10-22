@@ -17,6 +17,7 @@ export const GET_USERS = gql(`
       whatsapp
       maxAccount
       isActive
+      inviteStatus
     }
   }
 `);
@@ -38,6 +39,7 @@ export const CREATE_USER = gql(`
       whatsapp
       maxAccount
       isActive
+      inviteStatus
     }
   }
 `);
@@ -59,6 +61,7 @@ export const DEACTIVATE_USER = gql(`
       whatsapp
       maxAccount
       isActive
+      inviteStatus
     }
   }
 `);
@@ -80,6 +83,7 @@ export const ACTIVATE_USER = gql(`
       whatsapp
       maxAccount
       isActive
+      inviteStatus
     }
   }
 `);
@@ -101,6 +105,7 @@ export const UPDATE_USER = gql(`
       whatsapp
       maxAccount
       isActive
+      inviteStatus
     }
   }
 `);

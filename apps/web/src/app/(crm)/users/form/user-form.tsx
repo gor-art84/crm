@@ -13,9 +13,9 @@ import { toDateInputValue, toDayjs } from "@/shared/lib/date-ru";
 import { formatFullName, getInitials } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
+import type { UserRow } from "../ui/user-row";
 import { useFioSuggest } from "./use-fio-suggest";
 import { UserFioAutocomplete } from "./user-fio-autocomplete";
-import type { UserRow } from "./user-row";
 import { type CreateUserSchema, createUserSchema, editUserSchema } from "./user-schema";
 
 type UserFormProps = {
@@ -51,7 +51,6 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
     resolver: zodResolver(isEdit ? editUserSchema : createUserSchema),
     defaultValues: {
       email: user?.email ?? "",
-      password: "",
       firstName: user?.firstName ?? "",
       middleName: user?.middleName ?? "",
       lastName: user?.lastName ?? "",
@@ -142,7 +141,6 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
           variables: {
             createUserInput: {
               email: values.email,
-              password: values.password,
               firstName: values.firstName,
               middleName: values.middleName?.trim() || undefined,
               lastName: values.lastName,
@@ -224,25 +222,6 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
             />
           )}
         />
-        {!isEdit && (
-          <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                type="password"
-                label="Пароль"
-                autoComplete="new-password"
-                size="small"
-                fullWidth
-                error={Boolean(fieldState.error)}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
-        )}
-
         <UserFioAutocomplete
           value={fioInput}
           onInputChange={setFioInput}

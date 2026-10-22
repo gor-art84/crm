@@ -8,7 +8,6 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
-  MinLength,
 } from "class-validator";
 import { Permission, Role } from "../../generated/prisma/enums.js";
 
@@ -22,11 +21,6 @@ export class CreateUserInput {
   @IsNotEmpty()
   @Field(() => String)
   email: string;
-
-  @IsString()
-  @MinLength(8)
-  @Field(() => String)
-  password: string;
 
   @IsString()
   @IsNotEmpty()

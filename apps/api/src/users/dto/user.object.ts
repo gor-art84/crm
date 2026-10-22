@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { Role } from "../../generated/prisma/enums.js";
+import { InviteStatus } from "../../invites/invite-status.enum.js";
 
 @ObjectType()
 export class UserObject {
@@ -50,4 +51,7 @@ export class UserObject {
 
   @Field(() => Date, { nullable: true })
   updatedAt?: Date | null;
+
+  @Field(() => InviteStatus)
+  inviteStatus: InviteStatus;
 }

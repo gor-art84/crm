@@ -8,11 +8,11 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
-import argon2 from "argon2";
 import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
 import { Prisma, Role } from "../generated/prisma/client.js";
 import { ImageProcessingService } from "../images/image-processing.service.js";
+import { InvitesService } from "../invites/invites.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
@@ -45,6 +45,7 @@ export class UsersService {
     private readonly sessionsService: SessionsService,
     @Inject(OBJECT_STORAGE) private readonly storage: ObjectStorage,
     private readonly imageProcessingService: ImageProcessingService,
+    private readonly invitesService: InvitesService,
   ) {}
 
   private static readonly AVATAR_MIME: Record<string, string> = {
@@ -86,13 +87,75 @@ export class UsersService {
     }
   }
 
+  private async toUserObject(user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: Role;
+    isActive: boolean;
+    middleName: string | null;
+    birthDate: Date | null;
+    phone: string | null;
+    telegram: string | null;
+    whatsapp: string | null;
+    maxAccount: string | null;
+    jobTitle: string | null;
+    avatarKey?: string | null;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+  }): Promise<UserObject> {
+    const inviteData = await this.prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      select: {
+        passwordHash: true,
+        userInvites: {
+          where: { usedAt: null },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            expiresAt: true,
+            usedAt: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    return {
+      ...user,
+      inviteStatus: this.invitesService.resolveInviteStatus(inviteData),
+    };
+  }
+
   async findMany(): Promise<UserObject[]> {
-    return this.prisma.user.findMany({
-      select: { ...userSelect, createdAt: true, updatedAt: true },
+    const users = await this.prisma.user.findMany({
+      select: {
+        ...userSelect,
+        createdAt: true,
+        updatedAt: true,
+        passwordHash: true,
+        userInvites: {
+          where: { usedAt: null },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            expiresAt: true,
+            usedAt: true,
+            createdAt: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
     });
+    return users.map(({ passwordHash, userInvites, ...user }) => ({
+      ...user,
+      inviteStatus: this.invitesService.resolveInviteStatus({
+        passwordHash,
+        userInvites,
+      }),
+    }));
   }
 
   async create(createUserInput: CreateUserInput): Promise<UserObject> {
@@ -102,7 +165,6 @@ export class UsersService {
       Array.from(extraPermissions),
     );
 
-    const passwordHash = await argon2.hash(createUserInput.password);
     const email = createUserInput.email.toLowerCase();
     await this.assertEmailAvailable(email);
 
@@ -120,7 +182,7 @@ export class UsersService {
         jobTitle: emptyToNull(createUserInput.jobTitle),
         role: createUserInput.role,
         isActive: true,
-        passwordHash,
+        passwordHash: null,
         permissions: {
           create: permissionsBeyondRole.map((permission) => ({ permission })),
         },
@@ -128,7 +190,9 @@ export class UsersService {
       select: userSelect,
     });
 
-    return user;
+    await this.invitesService.issueInvite(user);
+
+    return this.toUserObject(user);
   }
 
   async deactivate(userId: string, actorUserId: string): Promise<UserObject> {
@@ -146,16 +210,17 @@ export class UsersService {
       select: userSelect,
     });
     await this.sessionsService.revokeAllSessions(userId);
-    return updatedUser;
+    return this.toUserObject(updatedUser);
   }
 
   async activate(userId: string): Promise<UserObject> {
     await this.requireUser(userId);
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: { isActive: true },
       select: userSelect,
     });
+    return this.toUserObject(updatedUser);
   }
 
   async update(userId: string, input: UpdateUserInput): Promise<UserObject> {
@@ -187,11 +252,12 @@ export class UsersService {
     if (input.jobTitle !== undefined) data.jobTitle = emptyToNull(input.jobTitle);
 
     if (input.extraPermissions === undefined) {
-      return this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id: userId },
         data,
         select: userSelect,
       });
+      return this.toUserObject(updatedUser);
     }
 
     const roleForFilter = input.role ?? user.role;
@@ -200,8 +266,8 @@ export class UsersService {
       input.extraPermissions ?? [],
     );
 
-    return this.prisma.$transaction(async (tx) => {
-      const updatedUser = await tx.user.update({
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
         where: { id: userId },
         data,
         select: userSelect,
@@ -215,8 +281,10 @@ export class UsersService {
         });
       }
 
-      return updatedUser;
+      return user;
     });
+
+    return this.toUserObject(updatedUser);
   }
 
   async uploadAvatar(
