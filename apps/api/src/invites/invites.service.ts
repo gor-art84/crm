@@ -18,8 +18,8 @@ export class InvitesService {
 
   async issueInvite(user: { id: string; email: string; firstName: string }): Promise<void> {
     await this.prisma.userInvite.updateMany({
-      where: { userId: user.id, usedAt: null },
-      data: { usedAt: new Date() },
+      where: { userId: user.id, usedAt: null, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
     const rawToken = randomBytes(32).toString("base64url");
     const tokenHash = this.hashToken(rawToken);
@@ -73,7 +73,7 @@ export class InvitesService {
       include: { user: { select: { id: true, email: true, firstName: true, passwordHash: true } } },
     });
 
-    if (!invite || invite.usedAt || invite.expiresAt < new Date()) {
+    if (!invite || invite.usedAt || invite.revokedAt || invite.expiresAt < new Date()) {
       throw new NotFoundException("Приглашение недействительно или истекло");
     }
     if (invite.user.passwordHash) {
@@ -109,17 +109,18 @@ export class InvitesService {
     return { ok: true };
   }
 
+  /**
+   * Expects `userInvites` already narrowed by the query to the latest open invite
+   * (usedAt = null, revokedAt = null, ordered by createdAt desc, take 1).
+   */
   resolveInviteStatus(user: {
     passwordHash: string | null;
-    userInvites: { expiresAt: Date; usedAt: Date | null; createdAt: Date }[];
+    userInvites: { expiresAt: Date }[];
   }): InviteStatus {
-    const latestOpenInvite =
-      user.userInvites
-        .filter((invite) => invite.usedAt === null)
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0] ?? null;
+    const latestOpenInvite = user.userInvites[0] ?? null;
     return computeInviteStatus({
       passwordHash: user.passwordHash,
-      latestOpenInvite: latestOpenInvite ? { expiresAt: latestOpenInvite.expiresAt } : null,
+      latestOpenInvite,
     });
   }
 }
