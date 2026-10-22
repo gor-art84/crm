@@ -8,6 +8,7 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
+import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
 import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
 import { Prisma, Role } from "../generated/prisma/client.js";
@@ -125,6 +126,29 @@ export class UsersService {
       ...user,
       inviteStatus: this.invitesService.resolveInviteStatus(inviteData),
     };
+  }
+
+  private async syncPermissions(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    input: UpdateUserInput,
+    role: Role,
+  ): Promise<void> {
+    if (input.extraPermissions !== undefined) {
+      const permissionsBeyondRole = filterPermissionsBeyondRole(role, input.extraPermissions);
+      await tx.userPermission.deleteMany({ where: { userId } });
+      if (permissionsBeyondRole.length > 0) {
+        await tx.userPermission.createMany({
+          data: permissionsBeyondRole.map((permission) => ({ userId, permission })),
+        });
+      }
+      return;
+    }
+    if (input.role !== undefined) {
+      await tx.userPermission.deleteMany({
+        where: { userId, permission: { in: ROLE_PERMISSIONS[role] } },
+      });
+    }
   }
 
   async findMany(): Promise<UserObject[]> {
@@ -251,37 +275,16 @@ export class UsersService {
     if (input.maxAccount !== undefined) data.maxAccount = emptyToNull(input.maxAccount);
     if (input.jobTitle !== undefined) data.jobTitle = emptyToNull(input.jobTitle);
 
-    if (input.extraPermissions === undefined) {
-      const updatedUser = await this.prisma.user.update({
-        where: { id: userId },
-        data,
-        select: userSelect,
-      });
-      return this.toUserObject(updatedUser);
-    }
-
-    const roleForFilter = input.role ?? user.role;
-    const permissionsBeyondRole = filterPermissionsBeyondRole(
-      roleForFilter,
-      input.extraPermissions ?? [],
-    );
-
     const updatedUser = await this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.update({
+      const updated = await tx.user.update({
         where: { id: userId },
         data,
         select: userSelect,
       });
 
-      await tx.userPermission.deleteMany({ where: { userId } });
+      await this.syncPermissions(tx, userId, input, updated.role);
 
-      if (permissionsBeyondRole.length > 0) {
-        await tx.userPermission.createMany({
-          data: permissionsBeyondRole.map((permission) => ({ userId, permission })),
-        });
-      }
-
-      return user;
+      return updated;
     });
 
     return this.toUserObject(updatedUser);
