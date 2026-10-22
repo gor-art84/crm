@@ -3,8 +3,8 @@
 import { Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { X } from "lucide-react";
 import { formatFullName } from "@/shared/lib/person-name";
+import type { UserRow } from "../ui/user-row";
 import { UserForm } from "./user-form";
-import type { UserRow } from "./user-row";
 
 type UserFormDrawerProps = {
   user?: UserRow | null;

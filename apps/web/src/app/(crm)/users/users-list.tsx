@@ -4,18 +4,20 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { Alert, Button, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { RESEND_INVITE } from "@/shared/api/graphql/invites";
 import { ME } from "@/shared/api/graphql/me";
 import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
+import { UserDetailsDrawer } from "./details/user-details-drawer";
+import { UserFormDrawer } from "./form/user-form-drawer";
 import {
   filterUsers,
   parseUsersFilters,
   type UsersFiltersType,
   usersFiltersToSearchParams,
-} from "./filter-users";
-import { UserFormDrawer } from "./user-form-drawer";
-import type { UserRow } from "./user-row";
-import { UsersFilters } from "./users-filters";
-import { UsersTable } from "./users-table";
+} from "./list/filter-users";
+import { UsersFilters } from "./list/users-filters";
+import { UsersTable } from "./list/users-table";
+import type { UserRow } from "./ui/user-row";
 
 const SKELETON_ROWS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
 
@@ -33,8 +35,13 @@ export const UsersList = () => {
     refetchQueries: [{ query: GET_USERS }],
   });
 
+  const [resendInvite, { error: resendError }] = useMutation(RESEND_INVITE, {
+    refetchQueries: [{ query: GET_USERS }],
+  });
+
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [drawer, setDrawer] = useState<DrawerState>({ type: "closed" });
+  const [detailsUser, setDetailsUser] = useState<UserRow | null>(null);
 
   const pathName = usePathname();
   const router = useRouter();
@@ -86,7 +93,18 @@ export const UsersList = () => {
     }
   };
 
-  const mutationError = deactivateError ?? activateError;
+  const handleResendInvite = async (userId: string) => {
+    setPendingUserId(userId);
+    try {
+      await resendInvite({ variables: { userId } });
+    } catch {
+      // Ошибка отображается через состояние мутации
+    } finally {
+      setPendingUserId(null);
+    }
+  };
+
+  const mutationError = deactivateError ?? activateError ?? resendError;
 
   return (
     <Stack sx={{ gap: 2 }}>
@@ -121,19 +139,26 @@ export const UsersList = () => {
           </Button>
         </Paper>
       ) : (
-        <UsersTable
-          users={filteredUsers}
-          onDeactivate={handleDeactivate}
-          onActivate={handleActivate}
-          currentUserId={meData?.me?.id}
-          pendingUserId={pendingUserId}
-          onEdit={(user) => setDrawer({ type: "edit", user })}
-        />
+        <UsersTable users={filteredUsers} onOpen={(user) => setDetailsUser(user)} />
       )}
       <UserFormDrawer
         user={drawer.type === "edit" ? drawer.user : null}
         open={drawer.type !== "closed"}
         onClose={() => setDrawer({ type: "closed" })}
+      />
+      <UserDetailsDrawer
+        user={detailsUser}
+        open={detailsUser !== null}
+        currentUserId={meData?.me?.id}
+        pending={pendingUserId !== null && pendingUserId === detailsUser?.id}
+        onClose={() => setDetailsUser(null)}
+        onEdit={(user) => {
+          setDetailsUser(null);
+          setDrawer({ type: "edit", user });
+        }}
+        onResendInvite={handleResendInvite}
+        onActivate={handleActivate}
+        onDeactivate={handleDeactivate}
       />
     </Stack>
   );

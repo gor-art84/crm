@@ -32,6 +32,9 @@ export class AuthService {
     if (!user?.isActive) {
       throw new UnauthorizedException("Invalid credentials");
     }
+    if (!user.passwordHash) {
+      throw new UnauthorizedException("Приглашение ещё не принято");
+    }
 
     const passwordOk = await argon2.verify(user.passwordHash, password);
     if (!passwordOk) {

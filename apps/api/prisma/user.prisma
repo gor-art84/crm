@@ -18,7 +18,7 @@ enum Permission {
 model User {
   id           String           @id @default(uuid())
   email        String           @unique
-  passwordHash String
+  passwordHash String?
   lastName     String           @default("User")
   firstName    String           @default("Admin")
   permissions  UserPermission[]
@@ -34,6 +34,7 @@ model User {
   avatarKey    String?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
+  userInvites  UserInvite[]
 }
 
 model UserPermission {
@@ -42,4 +43,15 @@ model UserPermission {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, permission])
+}
+
+model UserInvite {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -31,13 +31,9 @@ export const userProfileFields = z.object({
   maxAccount: z.string(),
 });
 
-export const createUserSchema = userProfileFields.extend({
-  password: z.string().min(8, { message: "Пароль должен быть не менее 8 символов" }),
-});
+export const createUserSchema = userProfileFields;
 
-export const editUserSchema = userProfileFields.extend({
-  password: z.string(),
-});
+export const editUserSchema = userProfileFields;
 
 export type CreateUserSchema = z.infer<typeof createUserSchema>;
 export type EditUserSchema = z.infer<typeof editUserSchema>;

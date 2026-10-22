@@ -29,6 +29,7 @@ export const envSchema = z
     S3_ACCESS_KEY_ID: z.string().min(1),
     S3_SECRET_ACCESS_KEY: z.string().min(1),
     S3_PUBLIC_BASE_URL: z.url(),
+    WEB_ORIGIN: z.url(),
   })
   .refine((data) => data.SESSION_IDLE_TIMEOUT_SECONDS <= data.SESSION_ABSOLUTE_TIMEOUT_SECONDS, {
     message:
