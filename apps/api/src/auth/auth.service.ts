@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { randomBytes } from "node:crypto";
+import { Injectable, OnModuleInit, UnauthorizedException } from "@nestjs/common";
 import * as argon2 from "argon2";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
@@ -6,11 +7,16 @@ import { LoginInput } from "./dto/login.input.dto.js";
 import { SessionsService } from "./sessions.service.js";
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
+  private fakeHash: string;
   constructor(
     private readonly prismaService: PrismaService,
     private readonly sessionsService: SessionsService,
   ) {}
+
+  async onModuleInit() {
+    this.fakeHash = await argon2.hash(randomBytes(32));
+  }
 
   async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
@@ -29,15 +35,10 @@ export class AuthService {
         isActive: true,
       },
     });
-    if (!user?.isActive) {
-      throw new UnauthorizedException("Invalid credentials");
-    }
-    if (!user.passwordHash) {
-      throw new UnauthorizedException("Приглашение ещё не принято");
-    }
 
-    const passwordOk = await argon2.verify(user.passwordHash, password);
-    if (!passwordOk) {
+    const passwordOk = await argon2.verify(user?.passwordHash ?? this.fakeHash, password);
+
+    if (!user?.isActive || !user.passwordHash || !passwordOk) {
       throw new UnauthorizedException("Invalid credentials");
     }
 
