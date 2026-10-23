@@ -2,6 +2,7 @@
 
 import { Box, Paper, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
+import { ThemeModeSwitcher } from "@/shared/ui/theme/theme-mode-switcher";
 import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 
 export const TopBar = () => {
@@ -31,6 +32,7 @@ export const TopBar = () => {
         </Typography>
       )}
       <Box sx={{ flex: 1 }} />
+      <ThemeModeSwitcher />
     </Paper>
   );
 };

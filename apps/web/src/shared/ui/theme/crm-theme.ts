@@ -7,12 +7,14 @@ declare module "@mui/material/Paper" {
 }
 
 export const crmTheme = createTheme({
-  cssVariables: true,
+  cssVariables: {
+    colorSchemeSelector: "data",
+  },
   colorSchemes: {
     light: {
       palette: {
         primary: {
-          main: "#111318",
+          main: "#1D5C6B",
           contrastText: "#FFFFFF",
         },
         text: {
