@@ -16,7 +16,7 @@ dayjs.locale("ru");
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AppRouterCacheProvider>
-      <ThemeProvider theme={crmTheme}>
+      <ThemeProvider theme={crmTheme} defaultMode="system">
         <LocalizationProvider
           dateAdapter={AdapterDayjs}
           adapterLocale="ru"

@@ -46,7 +46,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                         height: 32,
                         fontSize: 13,
                         fontWeight: 600,
-                        backgroundColor: "grey.200",
+                        backgroundColor: "action.selected",
                         color: "text.primary",
                       }}
                       src={user.avatarUrl ?? undefined}

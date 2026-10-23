@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { InitColorSchemeScript } from "@mui/material";
 import { ApolloWrapper } from "@/app/providers/ApolloWrapper";
 import { AppThemeProvider } from "@/shared/ui/theme/AppThemeProvider";
 
@@ -21,8 +22,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="ru"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <body>
+        <InitColorSchemeScript attribute="data" defaultMode="system" />
         <AppThemeProvider>
           <ApolloWrapper>{children}</ApolloWrapper>
         </AppThemeProvider>

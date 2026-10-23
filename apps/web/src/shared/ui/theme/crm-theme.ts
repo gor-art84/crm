@@ -7,12 +7,14 @@ declare module "@mui/material/Paper" {
 }
 
 export const crmTheme = createTheme({
-  cssVariables: true,
+  cssVariables: {
+    colorSchemeSelector: "data",
+  },
   colorSchemes: {
     light: {
       palette: {
         primary: {
-          main: "#111318",
+          main: "#1D5C6B",
           contrastText: "#FFFFFF",
         },
         text: {
@@ -52,6 +54,40 @@ export const crmTheme = createTheme({
         action: {
           hover: "rgba(17, 19, 24, 0.04)",
           selected: "rgba(17, 19, 24, 0.07)",
+        },
+      },
+    },
+    dark: {
+      palette: {
+        primary: {
+          main: "#7CC0CF",
+          contrastText: "#08222A",
+        },
+        text: {
+          primary: "#ECEDF0",
+          secondary: "#8C929D",
+          disabled: "#5B616E",
+        },
+        background: {
+          default: "#0E0F12",
+          paper: "#14161A",
+        },
+        divider: "#24272E",
+        success: {
+          main: "#3FCF7D",
+        },
+        warning: {
+          main: "#E9A944",
+        },
+        error: {
+          main: "#F87171",
+        },
+        info: {
+          main: "#8EA6F5",
+        },
+        action: {
+          hover: "rgba(236, 237, 240, 0.05)",
+          selected: "rgba(236, 237, 240, 0.08)",
         },
       },
     },
@@ -135,6 +171,11 @@ export const crmTheme = createTheme({
             border: "1px solid rgba(17, 19, 24, 0.06)",
             borderRadius: 20,
             boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
+            ...theme.applyStyles("dark", {
+              backgroundColor: "rgba(20, 22, 26, 0.92)",
+              border: "1px solid rgba(236, 237, 240, 0.06)",
+              boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 32px rgba(0, 0, 0, 0.35)",
+            }),
             "@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
               backgroundColor: "rgba(255, 255, 255, 0.4)",
               backgroundImage:
@@ -148,6 +189,17 @@ export const crmTheme = createTheme({
               ].join(", "),
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              ...theme.applyStyles("dark", {
+                backgroundColor: "rgba(20, 22, 26, 0.55)",
+                backgroundImage:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%)",
+                border: "1px solid rgba(236, 237, 240, 0.08)",
+                boxShadow: [
+                  "inset 0 1px 0 rgba(255, 255, 255, 0.06)",
+                  "0 0 0 1px rgba(0, 0, 0, 0.4)",
+                  "0 8px 32px rgba(0, 0, 0, 0.4)",
+                ].join(", "),
+              }),
             },
             "@media (prefers-reduced-transparency: reduce)": {
               backgroundColor: theme.vars.palette.background.paper,
@@ -191,14 +243,18 @@ export const crmTheme = createTheme({
       },
     },
     MuiCssBaseline: {
-      styleOverrides: {
+      styleOverrides: (theme) => ({
         body: {
           backgroundImage:
             "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.22), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.16), transparent 55%)",
           backgroundAttachment: "fixed",
           minHeight: "100vh",
+          ...theme.applyStyles("dark", {
+            backgroundImage:
+              "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.07), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.05), transparent 55%)",
+          }),
         },
-      },
+      }),
     },
     MuiTableCell: {
       styleOverrides: {
@@ -212,7 +268,7 @@ export const crmTheme = createTheme({
           fontSize: "0.75rem",
           fontWeight: 500,
           color: theme.vars.palette.text.secondary,
-          backgroundColor: theme.vars.palette.grey[50],
+          backgroundColor: theme.vars.palette.background.default,
           whiteSpace: "nowrap",
         }),
       },
