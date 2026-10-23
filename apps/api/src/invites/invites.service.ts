@@ -17,11 +17,15 @@ export class InvitesService {
     @Inject(MAIL) private readonly mail: Mail,
   ) {}
 
-  async createInvite(tx: Prisma.TransactionClient, userId: string): Promise<string> {
+  async revokeOpenInvites(tx: Prisma.TransactionClient, userId: string): Promise<void> {
     await tx.userInvite.updateMany({
       where: { userId, usedAt: null, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+  }
+
+  async createInvite(tx: Prisma.TransactionClient, userId: string): Promise<string> {
+    await this.revokeOpenInvites(tx, userId);
 
     const rawToken = randomBytes(32).toString("base64url");
     const tokenHash = this.hashToken(rawToken);
@@ -58,17 +62,21 @@ export class InvitesService {
   async resend(userId: string): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, firstName: true, passwordHash: true },
+      select: { id: true, email: true, firstName: true, passwordHash: true, isActive: true },
     });
     if (!user) {
       throw new NotFoundException("Пользователь не найден");
     }
+    if (!user.isActive) {
+      throw new BadRequestException("Пользователь деактивирован");
+    }
+
     if (user.passwordHash !== null) {
       throw new BadRequestException("Пользователь уже активировал аккаунт");
     }
-    const rawToken = await this.prisma.$transaction(async (tx) => {
-      return await this.createInvite(tx, userId);
-    });
+    const rawToken = await this.prisma.$transaction(
+      async (tx) => await this.createInvite(tx, userId),
+    );
     await this.sendInvite({ email: user.email, firstName: user.firstName }, rawToken);
   }
 
@@ -80,10 +88,19 @@ export class InvitesService {
     const tokenHash = this.hashToken(token);
     const invite = await this.prisma.userInvite.findUnique({
       where: { tokenHash },
-      include: { user: { select: { id: true, email: true, firstName: true, passwordHash: true } } },
+      include: {
+        user: {
+          select: { id: true, email: true, firstName: true, passwordHash: true, isActive: true },
+        },
+      },
     });
 
-    if (!invite || invite.usedAt || invite.revokedAt || invite.expiresAt < new Date()) {
+    if (
+      !invite?.user.isActive ||
+      invite.usedAt ||
+      invite.revokedAt ||
+      invite.expiresAt < new Date()
+    ) {
       throw new NotFoundException("Приглашение недействительно или истекло");
     }
     if (invite.user.passwordHash) {
@@ -105,16 +122,20 @@ export class InvitesService {
     const invite = await this.findValidInvite(token);
     const passwordHash = await argon2.hash(password);
 
-    await this.prisma.$transaction([
-      this.prisma.user.update({
+    await this.prisma.$transaction(async (tx) => {
+      const result = await tx.userInvite.updateMany({
+        where: { id: invite.id, usedAt: null, revokedAt: null, expiresAt: { gt: new Date() } },
+        data: { usedAt: new Date() },
+      });
+
+      if (result.count === 0) {
+        throw new NotFoundException("Приглашение недействительно или истекло");
+      }
+      await tx.user.update({
         where: { id: invite.userId },
         data: { passwordHash },
-      }),
-      this.prisma.userInvite.update({
-        where: { id: invite.id },
-        data: { usedAt: new Date() },
-      }),
-    ]);
+      });
+    });
 
     return { ok: true };
   }

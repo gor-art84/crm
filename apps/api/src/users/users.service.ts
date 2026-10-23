@@ -234,11 +234,16 @@ export class UsersService {
 
     await this.assertCanDemoteAdmin(existingUser);
 
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: { isActive: false },
-      select: userSelect,
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.user.update({
+        where: { id: userId },
+        data: { isActive: false },
+        select: userSelect,
+      });
+      await this.invitesService.revokeOpenInvites(tx, userId);
+      return updated;
     });
+
     await this.sessionsService.revokeAllSessions(userId);
     return this.toUserObject(updatedUser);
   }
