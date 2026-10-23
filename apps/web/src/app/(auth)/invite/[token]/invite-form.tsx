@@ -94,7 +94,7 @@ export const InviteForm = () => {
                 px: 1.5,
                 py: 1.25,
                 borderRadius: 2,
-                bgcolor: "grey.50",
+                bgcolor: "background.default",
                 border: "1px solid",
                 borderColor: "divider",
               }}

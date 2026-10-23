@@ -62,7 +62,7 @@ export const SidebarUser = () => {
           height: 32,
           fontSize: 13,
           fontWeight: 600,
-          bgcolor: "grey.200",
+          bgcolor: "action.selected",
           color: "text.primary",
         }}
       >
