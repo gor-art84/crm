@@ -138,7 +138,7 @@ export const crmTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 6,
   },
   focusVisible: true,
   components: {
@@ -159,7 +159,7 @@ export const crmTheme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           border: `1px solid ${theme.vars.palette.divider}`,
-          borderRadius: 12,
+          borderRadius: 10,
           backgroundImage: "none",
         }),
       },
@@ -169,7 +169,7 @@ export const crmTheme = createTheme({
           style: ({ theme }) => ({
             backgroundColor: "rgba(255, 255, 255, 0.92)",
             border: "1px solid rgba(17, 19, 24, 0.06)",
-            borderRadius: 20,
+            borderRadius: 14,
             boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 32px rgba(17, 19, 24, 0.06)",
             ...theme.applyStyles("dark", {
               backgroundColor: "rgba(20, 22, 26, 0.92)",
@@ -221,8 +221,8 @@ export const crmTheme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: 8,
-          minHeight: 36,
+          borderRadius: theme.shape.borderRadius,
+          minHeight: "var(--crm-nav-h)",
           paddingInline: 10,
           gap: 10,
           color: theme.vars.palette.text.secondary,
@@ -254,23 +254,39 @@ export const crmTheme = createTheme({
               "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.07), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.05), transparent 55%)",
           }),
         },
+        ":root": {
+          "--crm-row-h": "40px",
+          "--crm-nav-h": "36px",
+        },
+        ":root[data-density='compact']": {
+          "--crm-row-h": "34px",
+          "--crm-nav-h": "32px",
+        },
+        ":root[data-density='comfortable']": {
+          "--crm-row-h": "46px",
+          "--crm-nav-h": "40px",
+        },
       }),
     },
     MuiTableCell: {
       styleOverrides: {
         root: ({ theme }) => ({
           borderBottom: `1px solid ${theme.vars.palette.divider}`,
-          paddingBlock: 10,
           paddingInline: 16,
           fontSize: "0.875rem",
         }),
         head: ({ theme }) => ({
           fontSize: "0.75rem",
+          paddingBlock: 10,
           fontWeight: 500,
           color: theme.vars.palette.text.secondary,
           backgroundColor: theme.vars.palette.background.default,
           whiteSpace: "nowrap",
         }),
+        body: {
+          height: "var(--crm-row-h)",
+          paddingBlock: 0,
+        },
       },
     },
     MuiTableRow: {
