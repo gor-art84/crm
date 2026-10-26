@@ -1,14 +1,15 @@
 "use client";
 
-import { Avatar, Box, Button, Drawer, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Button, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { X } from "lucide-react";
-import { formatFullName, getInitials } from "@/shared/lib/person-name";
+import { formatFullName } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
-import { UserInviteStatusChip } from "../ui/user-invite-status-chip";
+import { StatusChip } from "@/shared/ui/status-chip";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { getUserStatus } from "../model/get-user-status";
 import type { UserRow } from "../ui/user-row";
-import { UserStatusChip } from "../ui/user-status-chip";
 
 type UserDetailsDrawerProps = {
   user: UserRow | null;
@@ -61,19 +62,7 @@ export const UserDetailsDrawer = ({
           </Stack>
 
           <Stack direction="row" sx={{ gap: 1.5, alignItems: "center" }}>
-            <Avatar
-              sx={{
-                width: 56,
-                height: 56,
-                fontSize: 13,
-                fontWeight: 600,
-                backgroundColor: "action.selected",
-                color: "text.primary",
-              }}
-              src={user.avatarUrl ?? undefined}
-            >
-              {getInitials(user.firstName, user.lastName)}
-            </Avatar>
+            <UserAvatar user={user} size={56} />
             <Stack sx={{ gap: 0.5, minWidth: 0 }}>
               <Typography variant="body1" sx={{ fontWeight: 500 }} noWrap>
                 {formatFullName(user)}
@@ -81,10 +70,7 @@ export const UserDetailsDrawer = ({
               <Typography variant="caption" color="text.secondary" noWrap>
                 {user.email}
               </Typography>
-              <Stack direction="row" sx={{ gap: 0.75, flexWrap: "wrap", alignItems: "center" }}>
-                <UserStatusChip isActive={user.isActive} />
-                <UserInviteStatusChip status={user.inviteStatus} />
-              </Stack>
+              <StatusChip {...getUserStatus(user)} />
             </Stack>
           </Stack>
 

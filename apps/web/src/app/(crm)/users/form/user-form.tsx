@@ -2,7 +2,7 @@
 
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Avatar, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { Alert, Box, Button, MenuItem, Stack, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useRef, useState } from "react";
@@ -10,9 +10,10 @@ import { Controller, useForm } from "react-hook-form";
 import { CREATE_USER, GET_USERS, UPDATE_USER } from "@/shared/api/graphql/users";
 import { uploadUserAvatar } from "@/shared/api/upload-user-avatar";
 import { toDateInputValue, toDayjs } from "@/shared/lib/date-ru";
-import { formatFullName, getInitials } from "@/shared/lib/person-name";
+import { formatFullName } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
+import { UserAvatar } from "@/shared/ui/user-avatar";
 import type { UserRow } from "../ui/user-row";
 import { useFioSuggest } from "./use-fio-suggest";
 import { UserFioAutocomplete } from "./user-fio-autocomplete";
@@ -173,12 +174,7 @@ export const UserForm = ({ user, onClose }: UserFormProps) => {
       )}
       {isEdit && user && (
         <Stack direction="row" sx={{ gap: 2, alignItems: "center" }}>
-          <Avatar
-            src={avatarPreview ?? undefined}
-            sx={{ width: 64, height: 64, fontSize: 20, fontWeight: 600 }}
-          >
-            {getInitials(user.firstName, user.lastName)}
-          </Avatar>
+          <UserAvatar user={{ ...user, avatarUrl: avatarPreview }} size={64} />
           <Stack sx={{ gap: 1 }}>
             <input
               ref={fileInputRef}
