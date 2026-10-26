@@ -1,23 +1,14 @@
 "use client";
 
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import {
-  Avatar,
-  Box,
-  Button,
-  IconButton,
-  Skeleton,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Button, IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LOGOUT } from "@/shared/api/graphql/logout";
 import { ME } from "@/shared/api/graphql/me";
-import { getInitials } from "@/shared/lib/person-name";
 import { ROLE_LABELS } from "@/shared/model/roles";
+import { UserAvatar } from "@/shared/ui/user-avatar";
 
 export const SidebarUser = () => {
   const { data, loading } = useQuery(ME);
@@ -56,18 +47,7 @@ export const SidebarUser = () => {
 
   return (
     <Stack direction="row" sx={{ px: 1, py: 0.5, alignItems: "center", gap: 1.25 }}>
-      <Avatar
-        sx={{
-          width: 32,
-          height: 32,
-          fontSize: 13,
-          fontWeight: 600,
-          bgcolor: "action.selected",
-          color: "text.primary",
-        }}
-      >
-        {getInitials(firstName, lastName)}
-      </Avatar>
+      <UserAvatar user={data.me} size={32} />
       <Box sx={{ minWidth: 0, flex: 1 }}>
         <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
           {firstName} {lastName}

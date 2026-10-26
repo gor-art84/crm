@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Paper,
   Stack,
@@ -12,11 +11,12 @@ import {
   Typography,
 } from "@mui/material";
 import type { GetUsersQuery } from "@/generated/graphql";
-import { formatFullName, getInitials } from "@/shared/lib/person-name";
-import { ROLE_LABELS } from "@/shared/model/roles";
-import { UserInviteStatusChip } from "../ui/user-invite-status-chip";
+import { formatFullName } from "@/shared/lib/person-name";
+import { RoleChip } from "@/shared/ui/role-chip";
+import { StatusChip } from "@/shared/ui/status-chip";
+import { UserAvatar } from "@/shared/ui/user-avatar";
+import { getUserStatus } from "../model/get-user-status";
 import type { UserRow } from "../ui/user-row";
-import { UserStatusChip } from "../ui/user-status-chip";
 
 type UsersTableProps = {
   users: GetUsersQuery["users"];
@@ -40,19 +40,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
               <TableRow hover key={user.id} onClick={() => onOpen(user)} sx={{ cursor: "pointer" }}>
                 <TableCell>
                   <Stack direction="row" sx={{ gap: 1.5, alignItems: "center" }}>
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        fontSize: 13,
-                        fontWeight: 600,
-                        backgroundColor: "action.selected",
-                        color: "text.primary",
-                      }}
-                      src={user.avatarUrl ?? undefined}
-                    >
-                      {getInitials(user.firstName, user.lastName)}
-                    </Avatar>
+                    <UserAvatar user={user} size={32} />
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
                         {formatFullName(user)}
@@ -61,19 +49,21 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                         variant="caption"
                         color="text.secondary"
                         noWrap
-                        sx={{ display: "block" }}
+                        sx={{
+                          display: "block",
+                          ':root[data-density="compact"] &': { display: "none" },
+                        }}
                       >
                         {user.email}
                       </Typography>
                     </Box>
                   </Stack>
                 </TableCell>
-                <TableCell>{ROLE_LABELS[user.role]}</TableCell>
                 <TableCell>
-                  <Stack direction="row" sx={{ gap: 0.75, alignItems: "center", flexWrap: "wrap" }}>
-                    <UserStatusChip isActive={user.isActive} />
-                    <UserInviteStatusChip status={user.inviteStatus} />
-                  </Stack>
+                  <RoleChip role={user.role} />
+                </TableCell>
+                <TableCell>
+                  <StatusChip {...getUserStatus(user)} />
                 </TableCell>
               </TableRow>
             );
