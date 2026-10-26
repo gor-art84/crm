@@ -225,6 +225,7 @@ export const crmTheme = createTheme({
           borderRadius: theme.shape.borderRadius,
           minHeight: "var(--crm-nav-h)",
           paddingInline: 10,
+          paddingBlock: 0,
           gap: 10,
           color: theme.vars.palette.text.secondary,
           transition: theme.transitions.create(["background-color", "color"], {
@@ -262,10 +263,6 @@ export const crmTheme = createTheme({
         ":root[data-density='compact']": {
           "--crm-row-h": "34px",
           "--crm-nav-h": "32px",
-        },
-        ":root[data-density='comfortable']": {
-          "--crm-row-h": "46px",
-          "--crm-nav-h": "40px",
         },
       }),
     },

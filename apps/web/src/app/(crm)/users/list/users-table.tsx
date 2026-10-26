@@ -51,7 +51,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                         noWrap
                         sx={{
                           display: "block",
-                          ':root[data-density="compact"] &': { display: "none" },
+                          'html[data-density="compact"] &': { display: "none" },
                         }}
                       >
                         {user.email}
