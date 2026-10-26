@@ -264,10 +264,6 @@ export const crmTheme = createTheme({
           "--crm-row-h": "34px",
           "--crm-nav-h": "32px",
         },
-        ":root[data-density='comfortable']": {
-          "--crm-row-h": "46px",
-          "--crm-nav-h": "40px",
-        },
       }),
     },
     MuiTableCell: {

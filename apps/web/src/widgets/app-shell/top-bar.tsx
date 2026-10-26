@@ -1,7 +1,8 @@
 "use client";
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
+import { DensitySwitcher } from "@/shared/ui/density/density-switcher";
 import { ThemeModeSwitcher } from "@/shared/ui/theme/theme-mode-switcher";
 import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 
@@ -32,7 +33,10 @@ export const TopBar = () => {
         </Typography>
       )}
       <Box sx={{ flex: 1 }} />
-      <ThemeModeSwitcher />
+      <Stack direction="row" sx={{ gap: 1 }}>
+        <DensitySwitcher />
+        <ThemeModeSwitcher />
+      </Stack>
     </Paper>
   );
 };
