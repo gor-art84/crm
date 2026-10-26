@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mui": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--silent", "dlx", "@mui/mcp@latest"],
+      "env": {}
+    },
+    "next-devtools": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--silent", "dlx", "next-devtools-mcp@latest"],
+      "env": {}
+    }
+  }
+}
