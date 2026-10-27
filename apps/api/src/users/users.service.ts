@@ -18,6 +18,7 @@ import { InvitesService } from "../invites/invites.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
+import { UpdateMyProfileInput } from "./dto/update-my-profile.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
 import { filterPermissionsBeyondRole } from "./user-permissions.js";
@@ -349,5 +350,11 @@ export class UsersService {
     const user = await this.requireUser(userId);
     if (!user.isActive) throw new UnauthorizedException("Пользователь неактивен");
     return this.toUserObject(user);
+  }
+
+  async updateMyProfile(userId: string, input: UpdateMyProfileInput): Promise<UserObject> {
+    const user = await this.requireUser(userId);
+    if (!user.isActive) throw new UnauthorizedException("Пользователь неактивен");
+    return await this.update(userId, input);
   }
 }
