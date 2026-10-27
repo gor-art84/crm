@@ -68,6 +68,14 @@ export class UsersService {
     return user;
   }
 
+  private async requireActiveUser(userId: string) {
+    const user = await this.requireUser(userId);
+    if (!user.isActive) {
+      throw new UnauthorizedException("Пользователь не активен");
+    }
+    return user;
+  }
+
   private async assertCanDemoteAdmin(user: { role: Role; isActive: boolean }): Promise<void> {
     if (user.role !== Role.ADMINISTRATOR || !user.isActive) {
       return;
@@ -347,14 +355,19 @@ export class UsersService {
   }
 
   async findMyProfile(userId: string): Promise<UserObject> {
-    const user = await this.requireUser(userId);
-    if (!user.isActive) throw new UnauthorizedException("Пользователь неактивен");
-    return this.toUserObject(user);
+    return this.toUserObject(await this.requireActiveUser(userId));
   }
 
   async updateMyProfile(userId: string, input: UpdateMyProfileInput): Promise<UserObject> {
-    const user = await this.requireUser(userId);
-    if (!user.isActive) throw new UnauthorizedException("Пользователь неактивен");
-    return await this.update(userId, input);
+    const user = await this.requireActiveUser(userId);
+    return await this.update(user.id, input);
+  }
+
+  async uploadMyAvatar(
+    userId: string,
+    file: Express.Multer.File | undefined,
+  ): Promise<{ avatarUrl: string }> {
+    const user = await this.requireActiveUser(userId);
+    return await this.uploadAvatar(user.id, file);
   }
 }
