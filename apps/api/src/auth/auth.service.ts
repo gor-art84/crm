@@ -1,8 +1,14 @@
 import { randomBytes } from "node:crypto";
-import { Injectable, OnModuleInit, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  OnModuleInit,
+  UnauthorizedException,
+} from "@nestjs/common";
 import * as argon2 from "argon2";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { AuthPayload } from "./dto/auth.payload.js";
+import { ChangePasswordInput } from "./dto/change-password.input.js";
 import { LoginInput } from "./dto/login.input.dto.js";
 import { SessionsService } from "./sessions.service.js";
 
@@ -39,7 +45,7 @@ export class AuthService implements OnModuleInit {
     const passwordOk = await argon2.verify(user?.passwordHash ?? this.fakeHash, password);
 
     if (!user?.isActive || !user.passwordHash || !passwordOk) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException("Недействительные учетные данные");
     }
 
     const sessionId = await this.sessionsService.createSession(user.id);
@@ -76,7 +82,7 @@ export class AuthService implements OnModuleInit {
       },
     });
     if (!user?.isActive) {
-      throw new UnauthorizedException("Unauthorized");
+      throw new UnauthorizedException("Неавторизован");
     }
     return {
       id: user.id,
@@ -85,5 +91,41 @@ export class AuthService implements OnModuleInit {
       email: user.email,
       role: user.role,
     };
+  }
+
+  async changePassword(
+    userId: string,
+    sessionId: string,
+    input: ChangePasswordInput,
+  ): Promise<boolean> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        passwordHash: true,
+        isActive: true,
+      },
+    });
+    if (!user?.isActive || !user.passwordHash) {
+      throw new UnauthorizedException("Неавторизован");
+    }
+
+    const passwordOk = await argon2.verify(user.passwordHash, input.currentPassword);
+    if (!passwordOk) {
+      throw new BadRequestException("Неверный текущий пароль");
+    }
+
+    if (input.newPassword === input.currentPassword) {
+      throw new BadRequestException("Новый пароль должен отличаться от старого");
+    }
+
+    const passwordHash = await argon2.hash(input.newPassword);
+
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    await this.sessionsService.revokeOtherSessions(userId, sessionId);
+    return true;
   }
 }

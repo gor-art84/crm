@@ -3,7 +3,10 @@ import { ConfigService } from "@nestjs/config";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { EnvConfig } from "../config/env.schema.js";
 import { AuthService } from "./auth.service.js";
+import { CurrentSessionId } from "./decorators/current-session-id.decorator.js";
+import { CurrentUserId } from "./decorators/current-user-id.decorator.js";
 import { AuthPayload } from "./dto/auth.payload.js";
+import { ChangePasswordInput } from "./dto/change-password.input.js";
 import { LoginInput } from "./dto/login.input.dto.js";
 import { type GqlContext } from "./gql-context.js";
 import { SessionAuthGuard } from "./guards/session-auth.guard.js";
@@ -51,5 +54,15 @@ export class AuthResolver {
       sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
     );
     return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(SessionAuthGuard)
+  async changePassword(
+    @CurrentSessionId() sessionId: string,
+    @CurrentUserId() userId: string,
+    @Args("input") input: ChangePasswordInput,
+  ): Promise<boolean> {
+    return await this.authService.changePassword(userId, sessionId, input);
   }
 }

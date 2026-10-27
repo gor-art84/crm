@@ -2,6 +2,6 @@ import { Request, Response } from "express";
 import { RedisSessionData } from "./session.js";
 
 export interface GqlContext {
-  req: Request & { session?: RedisSessionData };
+  req: Request & { session?: RedisSessionData; sessionId?: string };
   res: Response;
 }
