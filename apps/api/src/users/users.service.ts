@@ -7,6 +7,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
 import { SessionsService } from "../auth/sessions.service.js";
@@ -342,5 +343,11 @@ export class UsersService {
   getAvatarUrl(avatarKey: string | null | undefined): string | null {
     if (!avatarKey) return null;
     return this.storage.getPublicUrl(avatarKey);
+  }
+
+  async findMyProfile(userId: string): Promise<UserObject> {
+    const user = await this.requireUser(userId);
+    if (!user.isActive) throw new UnauthorizedException("Пользователь неактивен");
+    return this.toUserObject(user);
   }
 }
