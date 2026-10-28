@@ -8,7 +8,11 @@
     },
     "vtsls": {
       "settings": {
+        "vtsls": {
+          "autoUseWorkspaceTsdk": true
+        },
         "typescript": {
+          "tsdk": "apps/api/node_modules/typescript/lib",
           "tsserver": {
             "maxTsServerMemory": 8192
           }

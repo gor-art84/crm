@@ -37,6 +37,7 @@ export class SessionAuthGuard implements CanActivate {
 
     await this.sessionsService.touchSession(sessionId);
     request.session = session;
+    request.sessionId = sessionId;
     return true;
   }
 }

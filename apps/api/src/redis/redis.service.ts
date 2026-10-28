@@ -48,7 +48,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.sAdd(key, value);
   }
 
-  sRem(key: string, value: string) {
+  sRem(key: string, value: string | string[]) {
     return this.client.sRem(key, value);
   }
 

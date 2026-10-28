@@ -1,0 +1,31 @@
+meta {
+  name: wrong current
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation ChangePassword($input: ChangePasswordInput!) {
+    changePassword(input: $input)
+  }
+}
+
+body:graphql:vars {
+  {"input": {"newPassword": "{{newPassword}}", "currentPassword": "wrong-password"}}
+}
+
+assert {
+   res.body.errors[0].message: eq Неверный текущий пароль
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

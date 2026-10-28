@@ -7,6 +7,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
 import { SessionsService } from "../auth/sessions.service.js";
@@ -17,6 +18,7 @@ import { InvitesService } from "../invites/invites.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
+import { UpdateMyProfileInput } from "./dto/update-my-profile.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
 import { filterPermissionsBeyondRole } from "./user-permissions.js";
@@ -62,6 +64,14 @@ export class UsersService {
     });
     if (!user) {
       throw new NotFoundException(`Пользователь с id ${userId} не найден`);
+    }
+    return user;
+  }
+
+  private async requireActiveUser(userId: string) {
+    const user = await this.requireUser(userId);
+    if (!user.isActive) {
+      throw new UnauthorizedException("Пользователь не активен");
     }
     return user;
   }
@@ -342,5 +352,22 @@ export class UsersService {
   getAvatarUrl(avatarKey: string | null | undefined): string | null {
     if (!avatarKey) return null;
     return this.storage.getPublicUrl(avatarKey);
+  }
+
+  async findMyProfile(userId: string): Promise<UserObject> {
+    return this.toUserObject(await this.requireActiveUser(userId));
+  }
+
+  async updateMyProfile(userId: string, input: UpdateMyProfileInput): Promise<UserObject> {
+    const user = await this.requireActiveUser(userId);
+    return await this.update(user.id, input);
+  }
+
+  async uploadMyAvatar(
+    userId: string,
+    file: Express.Multer.File | undefined,
+  ): Promise<{ avatarUrl: string }> {
+    const user = await this.requireActiveUser(userId);
+    return await this.uploadAvatar(user.id, file);
   }
 }
