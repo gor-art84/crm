@@ -1,0 +1,31 @@
+meta {
+  name: change ok
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation ChangePassword($input: ChangePasswordInput!) {
+    changePassword(input: $input)
+  }
+}
+
+body:graphql:vars {
+  {"input": {"newPassword": "{{userPassword}}", "currentPassword": "{{newPassword}}"}}
+}
+
+assert {
+  res.body.data.changePassword: eq true
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}
