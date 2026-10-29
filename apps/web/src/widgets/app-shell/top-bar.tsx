@@ -9,7 +9,7 @@ import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 export const TopBar = () => {
   const path = usePathname();
   const currentItem = NAV_ITEMS.find((item) => isNavItemActive(item, path));
-  const title = currentItem?.label;
+  const title = currentItem?.label ?? (path.startsWith("/profile") ? "Профиль" : undefined);
 
   return (
     <Paper

@@ -1,7 +1,16 @@
 "use client";
 
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { Box, Button, IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonBase,
+  IconButton,
+  Skeleton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -46,16 +55,35 @@ export const SidebarUser = () => {
   const { firstName, lastName, role } = data.me;
 
   return (
-    <Stack direction="row" sx={{ px: 1, py: 0.5, alignItems: "center", gap: 1.25 }}>
-      <UserAvatar user={data.me} size={32} />
-      <Box sx={{ minWidth: 0, flex: 1 }}>
-        <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
-          {firstName} {lastName}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ display: "block" }} noWrap>
-          {ROLE_LABELS[role]}
-        </Typography>
-      </Box>
+    <Stack direction="row" sx={{ px: 0.75, py: 0.5, alignItems: "center", gap: 1.25 }}>
+      <ButtonBase
+        component={Link}
+        href="/profile"
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          justifyContent: "flex-start",
+          textAlign: "left",
+          alignItems: "center",
+          gap: 1.25,
+          p: 0.5,
+          borderRadius: 1,
+          "&:hover": {
+            backgroundColor: "action.hover",
+          },
+        }}
+      >
+        <UserAvatar user={data.me} size={32} />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
+            {firstName} {lastName}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: "block" }} noWrap>
+            {ROLE_LABELS[role]}
+          </Typography>
+        </Box>
+      </ButtonBase>
+
       <Tooltip title="Выйти">
         <span>
           <IconButton
