@@ -19,3 +19,23 @@ export const MY_PROFILE = gql(`
     }
   }
   `);
+
+export const UPDATE_MY_PROFILE = gql(`
+  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {
+    updateMyProfile(input: $input) {
+      id
+      email
+      firstName
+      middleName
+      lastName
+      role
+      jobTitle
+      avatarUrl
+      phone
+      telegram
+      whatsapp
+      maxAccount
+      birthDate
+    }
+  }
+`);
