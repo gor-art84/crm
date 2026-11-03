@@ -1,0 +1,12 @@
+# API (`apps/api`, NestJS 12, ESM)
+
+- ESM package: relative imports must use the `.js` extension (`./users.service.js`).
+- GraphQL code-first (Apollo driver, `autoSchemaFile: true`, `sortSchema: true`) — the schema is derived from `@ObjectType`/`@InputType` DTOs in each module's `dto/`; there is no `.graphql` schema file. GQL context is `{ req, res }`.
+- Global `ValidationPipe` with `whitelist` + `forbidNonWhitelisted`: every input field needs a class-validator decorator or the request is rejected.
+- Prisma 7 with the `prisma-client` generator and `@prisma/adapter-pg`; schema is split across `prisma/*.prisma` (`schema.prisma` = generator/datasource, `user.prisma`, `client.prisma`). Import types/enums from `src/generated/prisma/*.js`, access DB via `PrismaService`.
+- **Auth is cookie sessions in Redis, not JWT.** `AuthService.login` verifies argon2 hash and `SessionsService` creates a random session id stored at `sessionKey(id)` with idle TTL, plus a per-user set (`userSessionsKey`) used by `revokeAllSessions` (e.g. on deactivation). `SessionAuthGuard` reads the cookie named `COOKIE_NAME`, enforces `SESSION_ABSOLUTE_TIMEOUT_SECONDS` from `issuedAt`, refreshes idle TTL, and sets `request.session`.
+- **Authorization:** protect resolvers/controllers with `@UseGuards(SessionAuthGuard, PermissionsGuard)` + `@Permissions(Permission.X)`. Effective permissions = role defaults (`auth/role-permissions.ts`, roles `ADMINISTRATOR | MANAGER | METHODIST`) combined with per-user `UserPermission` rows, resolved by `PermissionsService`. Use `getRequest(context)` to get the request for both HTTP and GraphQL contexts.
+- Users without `passwordHash` are pending invites: `invites` module issues `UserInvite` tokens (stored hashed), computes invite status, and accepts them by setting the password. Mail goes through the `MAIL` injection token (`mail/mail.ts` interface); currently bound to `ConsoleMailService` (logs instead of sending).
+- File uploads use REST, not GraphQL: `POST /users/:id/avatar` (multipart `file`) → `images` (sharp presets) → `storage` (`ObjectStorage` abstraction, S3-compatible Yandex Object Storage). The DB stores `avatarKey`; public URLs are built from `S3_PUBLIC_BASE_URL`.
+- `dadata` wraps DaData (FIO suggestions/cleaning, party lookup by INN) with Redis caching (`DADATA_TTL_SECONDS`).
+- Biome: in `apps/api`, `useImportType` is disabled — keep value imports for classes used by Nest DI/decorators (don't convert them to `import type`).
