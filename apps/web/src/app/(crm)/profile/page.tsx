@@ -1,40 +1,38 @@
 "use client";
 import { useQuery } from "@apollo/client/react";
-import { Alert, Box, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Alert, Box, Skeleton } from "@mui/material";
 import { MY_PROFILE } from "@/shared/api/graphql/profile";
-import { formatFullName } from "@/shared/lib/person-name";
-import { RoleChip } from "@/shared/ui/role-chip";
-import { UserAvatar } from "@/shared/ui/user-avatar";
 import { ProfileForm } from "./profile-form";
+import { ProfileSummary } from "./profile-summary";
+
+const gridSx = {
+  display: "grid",
+  gridTemplateColumns: {
+    xs: "1fr",
+    lg: "300px minmax(0, 1fr)",
+  },
+  gap: 3,
+  alignItems: "start",
+} as const;
 
 export default function ProfilePage() {
   const { data, loading, error } = useQuery(MY_PROFILE);
 
-  if (loading) return <Skeleton variant="rounded" height={120} />;
+  if (loading)
+    return (
+      <Box sx={gridSx}>
+        <Skeleton variant="rounded" height={420} />
+        <Skeleton variant="rounded" height={520} />
+      </Box>
+    );
   if (error) return <Alert severity="error">Не удалось загрузить профиль</Alert>;
   if (!data?.myProfile) return null;
   const { myProfile } = data;
 
   return (
-    <Stack sx={{ gap: 3 }}>
-      <Paper variant="outlined" sx={{ p: 3 }}>
-        <Stack direction="row" sx={{ gap: 2, alignItems: "center" }}>
-          <UserAvatar user={myProfile} size={64} />
-          <Box>
-            <Typography variant="h5">{formatFullName(myProfile)}</Typography>
-            <Typography color="text.secondary">{myProfile.email}</Typography>
-            <Stack direction="row" sx={{ gap: 1, alignItems: "center" }}>
-              <RoleChip role={myProfile.role} />
-              {myProfile.jobTitle && (
-                <Typography color="text.secondary" variant="body2">
-                  {myProfile.jobTitle}
-                </Typography>
-              )}
-            </Stack>
-          </Box>
-        </Stack>
-      </Paper>
+    <Box sx={gridSx}>
+      <ProfileSummary profile={myProfile} />
       <ProfileForm profile={myProfile} />
-    </Stack>
+    </Box>
   );
 }
