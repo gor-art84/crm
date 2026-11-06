@@ -1,12 +1,9 @@
 import { randomBytes } from "node:crypto";
-import {
-  BadRequestException,
-  Injectable,
-  OnModuleInit,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, OnModuleInit, UnauthorizedException } from "@nestjs/common";
 import * as argon2 from "argon2";
+import { GraphQLError } from "graphql";
 import { PrismaService } from "../prisma/prisma.service.js";
+import { AuthErrorCode } from "./auth.errors.js";
 import { AuthPayload } from "./dto/auth.payload.js";
 import { ChangePasswordInput } from "./dto/change-password.input.js";
 import { LoginInput } from "./dto/login.input.dto.js";
@@ -87,11 +84,19 @@ export class AuthService implements OnModuleInit {
 
     const passwordOk = await argon2.verify(user.passwordHash, input.currentPassword);
     if (!passwordOk) {
-      throw new BadRequestException("Неверный текущий пароль");
+      throw new GraphQLError("Неверный текущий пароль", {
+        extensions: {
+          code: AuthErrorCode.INVALID_CURRENT_PASSWORD,
+        },
+      });
     }
 
     if (input.newPassword === input.currentPassword) {
-      throw new BadRequestException("Новый пароль должен отличаться от старого");
+      throw new GraphQLError("Новый пароль должен отличаться от старого", {
+        extensions: {
+          code: AuthErrorCode.NEW_PASSWORD_SAME_AS_OLD,
+        },
+      });
     }
 
     const passwordHash = await argon2.hash(input.newPassword);
