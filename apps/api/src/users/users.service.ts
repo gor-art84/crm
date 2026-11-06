@@ -318,10 +318,10 @@ export class UsersService {
     if (!file) throw new BadRequestException("Файл не предоставлен");
     if (!UsersService.AVATAR_MIME[file.mimetype])
       throw new BadRequestException(
-        "Недопустимый формат файла. Допустимые форматы: png, jpeg, jpg.",
+        "Недопустимый формат файла. Допустимые форматы: PNG, WebP, JPG.",
       );
     if (file.size > 10 * 1024 * 1024)
-      throw new BadRequestException("Файл слишком большой. Максимальный размер: 10 MB.");
+      throw new BadRequestException("Файл слишком большой. Максимальный размер: 10 МБ.");
 
     const processed = await this.imageProcessingService.processImage(file.buffer, "avatar");
 
