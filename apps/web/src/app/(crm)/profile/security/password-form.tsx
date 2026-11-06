@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CHANGE_PASSWORD } from "@/shared/api/graphql/profile";
 import { ProfileSection } from "../profile-section";
+import { AuthErrorCode } from "./auth-error-code";
 import { type SecuritySchema, securitySchema } from "./security-schema";
 
 export const PasswordForm = () => {
@@ -37,13 +38,21 @@ export const PasswordForm = () => {
       setSaved(true);
     } catch (err) {
       if (CombinedGraphQLErrors.is(err)) {
-        if (err.errors[0]?.message === "Неверный текущий пароль") {
-          form.setError(
-            "currentPassword",
-            { message: err.errors[0]?.message },
-            { shouldFocus: true },
-          );
-          return;
+        switch (err.errors[0]?.extensions?.code) {
+          case AuthErrorCode.INVALID_CURRENT_PASSWORD:
+            form.setError(
+              "currentPassword",
+              { message: err.errors[0]?.message },
+              { shouldFocus: true },
+            );
+            return;
+          case AuthErrorCode.NEW_PASSWORD_SAME_AS_OLD:
+            form.setError(
+              "newPassword",
+              { message: err.errors[0]?.message },
+              { shouldFocus: true },
+            );
+            return;
         }
       }
       form.setError("root", { message: "Не удалось изменить пароль" });
