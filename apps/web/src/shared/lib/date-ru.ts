@@ -3,18 +3,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
-export const toDateInputValue = (value: unknown): string => {
+export const toDateInputValue = (value: string | null | undefined): string => {
   if (value == null || value === "") return "";
-  if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    value instanceof Date ||
-    dayjs.isDayjs(value)
-  ) {
-    const d = dayjs(value);
-    return d.isValid() ? d.format("YYYY-MM-DD") : "";
-  }
-  return "";
+  const d = dayjs(value);
+  return d.isValid() ? d.format("YYYY-MM-DD") : "";
 };
 
 export const toDayjs = (value: string): Dayjs | null => {

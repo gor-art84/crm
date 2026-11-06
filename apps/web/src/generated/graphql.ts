@@ -15,7 +15,7 @@ export type ChangePasswordInput = {
 };
 
 export type CreateUserInput = {
-  birthDate?: unknown;
+  birthDate?: string | null | undefined;
   email: string;
   extraPermissions?: Array<Permission> | null | undefined;
   firstName: string;
@@ -55,7 +55,7 @@ export type Role =
   | 'METHODIST';
 
 export type UpdateMyProfileInput = {
-  birthDate?: unknown;
+  birthDate?: string | null | undefined;
   firstName?: string | null | undefined;
   lastName?: string | null | undefined;
   maxAccount?: string | null | undefined;
@@ -66,7 +66,7 @@ export type UpdateMyProfileInput = {
 };
 
 export type UpdateUserInput = {
-  birthDate?: unknown;
+  birthDate?: string | null | undefined;
   email?: string | null | undefined;
   extraPermissions?: Array<Permission> | null | undefined;
   firstName?: string | null | undefined;
@@ -136,14 +136,14 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, role: Role, jobTitle: string | null, avatarUrl: string | null, phone: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, birthDate: unknown } };
+export type MeQuery = { me: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, role: Role, jobTitle: string | null, avatarUrl: string | null, phone: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, birthDate: string | null } };
 
 export type UpdateMyProfileMutationVariables = Exact<{
   input: UpdateMyProfileInput;
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, role: Role, jobTitle: string | null, avatarUrl: string | null, phone: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, birthDate: unknown } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, role: Role, jobTitle: string | null, avatarUrl: string | null, phone: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, birthDate: string | null } };
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
@@ -155,28 +155,28 @@ export type ChangePasswordMutation = { changePassword: boolean };
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { users: Array<{ id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: unknown, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus }> };
+export type GetUsersQuery = { users: Array<{ id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: string | null, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus }> };
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { createUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: unknown, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
+export type CreateUserMutation = { createUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: string | null, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
 
 export type DeactivateUserMutationVariables = Exact<{
   userId: string;
 }>;
 
 
-export type DeactivateUserMutation = { deactivateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: unknown, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
+export type DeactivateUserMutation = { deactivateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: string | null, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
 
 export type ActivateUserMutationVariables = Exact<{
   userId: string;
 }>;
 
 
-export type ActivateUserMutation = { activateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: unknown, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
+export type ActivateUserMutation = { activateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: string | null, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
 
 export type UpdateUserMutationVariables = Exact<{
   userId: string;
@@ -184,7 +184,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { updateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: unknown, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
+export type UpdateUserMutation = { updateUser: { id: string, email: string, firstName: string, middleName: string | null, lastName: string, phone: string | null, avatarUrl: string | null, role: Role, birthDate: string | null, jobTitle: string | null, telegram: string | null, whatsapp: string | null, maxAccount: string | null, isActive: boolean, inviteStatus: InviteStatus } };
 
 
 export const FioSuggestionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FioSuggestions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"count"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fioSuggestions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}},{"kind":"Argument","name":{"kind":"Name","value":"count"},"value":{"kind":"Variable","name":{"kind":"Name","value":"count"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"surname"}},{"kind":"Field","name":{"kind":"Name","value":"patronymic"}}]}}]}}]} as unknown as DocumentNode<FioSuggestionsQuery, FioSuggestionsQueryVariables>;
