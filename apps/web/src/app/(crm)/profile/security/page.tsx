@@ -1,9 +1,5 @@
-import { Typography } from "@mui/material";
+import { PasswordForm } from "./password-form";
 
 export default function ProfileSecurityPage() {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      Настройки безопасности появятся здесь
-    </Typography>
-  );
+  return <PasswordForm />;
 }
