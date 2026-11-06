@@ -26,6 +26,18 @@ pnpm 12.9.1 + Turborepo, Node `>=26.8.1 <27`. Workspace packages are `@apps/api`
 - pre-commit: `lint-staged` → `biome check --write` on staged files.
 - commit-msg: commitlint, conventional commits with an enforced `scope-enum`: `api, web, auth, clients, users, dadata, db, redis, config, deps, docker, ci, tooling` (see `commitlint.config.js`). Scopes like `invites` or `mail` will be rejected unless added there.
 
+## Delegation
+Mentor mode: the main session (Opus) is the mentor — it writes plans and hints, the user writes the code. Subagents never decide: they execute a brief from the main session and report back; the main session reviews their output before anything reaches the user. Do not delegate code writing.
+
+«проверь» flow: `verifier` runs the mechanical checks → main session reviews the diff for behavior changes → main session writes the commit message.
+
+Delegate mechanical work to cheaper subagents:
+- Broad codebase search (finding files, usages, conventions) → `Explore` (Haiku, user-level `~/.claude/agents/Explore.md`).
+- Mechanical pre-commit checks (git diff, `tsc` for both apps, Biome) on «проверь» → `verifier` (Haiku, `.claude/agents/verifier.md`, local — `.claude/` is gitignored).
+- Library/framework docs lookups (Context7, official docs, version-specific behavior) → `researcher` (Sonnet, user-level `~/.claude/agents/researcher.md`).
+- Any other subagent without its own `model:` runs on Sonnet (`CLAUDE_CODE_SUBAGENT_MODEL` in `~/.claude/settings.json`).
+- Stay in the main session: diff review for behavior changes, plans, architecture, commit messages. Green tsc/Biome is not a review — behavior regressions pass both.
+
 ## Architecture
 
 ### Configuration
