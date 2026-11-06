@@ -69,30 +69,6 @@ export class AuthService implements OnModuleInit {
     await this.sessionsService.deleteSession(sessionId);
   }
 
-  async me(userId: string): Promise<AuthPayload> {
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        role: true,
-        isActive: true,
-      },
-    });
-    if (!user?.isActive) {
-      throw new UnauthorizedException("Неавторизован");
-    }
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-    };
-  }
-
   async changePassword(
     userId: string,
     sessionId: string,

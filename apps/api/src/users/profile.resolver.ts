@@ -16,6 +16,12 @@ export class ProfileResolver {
     return this.usersService.findMyProfile(userId);
   }
 
+  @Query(() => UserObject)
+  @UseGuards(SessionAuthGuard)
+  async me(@CurrentUserId() userId: string) {
+    return this.usersService.findMyProfile(userId);
+  }
+
   @Mutation(() => UserObject)
   @UseGuards(SessionAuthGuard)
   async updateMyProfile(
