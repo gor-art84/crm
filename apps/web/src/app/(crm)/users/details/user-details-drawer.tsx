@@ -98,9 +98,7 @@ export const UserDetailsDrawer = ({
             </Typography>
             <Field
               label="Дата рождения"
-              value={
-                user.birthDate ? dayjs(user.birthDate as string | Date).format("D MMMM YYYY") : null
-              }
+              value={user.birthDate && dayjs(user.birthDate).format("D MMMM YYYY")}
             />
           </Stack>
 
