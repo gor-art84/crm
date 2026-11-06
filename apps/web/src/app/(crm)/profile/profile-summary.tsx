@@ -4,7 +4,7 @@ import { useApolloClient } from "@apollo/client/react";
 import { Box, CircularProgress, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { Camera } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
-import type { MyProfileQuery } from "@/generated/graphql";
+import type { MeQuery } from "@/generated/graphql";
 import { uploadMyAvatar } from "@/shared/api/upload-user-avatar";
 import { formatFullName } from "@/shared/lib/person-name";
 import { RoleChip } from "@/shared/ui/role-chip";
@@ -24,7 +24,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
 const MAX_AVATAR_SIZE = 1024 * 1024 * 10;
 
 type ProfileSummaryProps = {
-  profile: MyProfileQuery["myProfile"];
+  profile: MeQuery["me"];
 };
 
 export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {

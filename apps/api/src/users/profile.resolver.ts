@@ -12,12 +12,6 @@ export class ProfileResolver {
 
   @Query(() => UserObject)
   @UseGuards(SessionAuthGuard)
-  async myProfile(@CurrentUserId() userId: string) {
-    return this.usersService.findMyProfile(userId);
-  }
-
-  @Query(() => UserObject)
-  @UseGuards(SessionAuthGuard)
   async me(@CurrentUserId() userId: string) {
     return this.usersService.findMyProfile(userId);
   }

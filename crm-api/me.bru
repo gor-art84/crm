@@ -1,0 +1,44 @@
+meta {
+  name: me
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query {
+    me {
+      id
+        email
+        firstName
+        middleName
+        lastName
+        role
+        jobTitle
+        avatarUrl
+        phone
+        telegram
+        whatsapp
+        maxAccount
+        birthDate
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.errors: isUndefined
+  res.body.data.me.role: eq ADMINISTRATOR
+  res.body.data.me.avatarUrl: isString
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

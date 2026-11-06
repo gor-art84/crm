@@ -17,8 +17,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import type { MyProfileQuery } from "@/generated/graphql";
-import { ME } from "@/shared/api/graphql/me";
+import type { MeQuery } from "@/generated/graphql";
 import { UPDATE_MY_PROFILE } from "@/shared/api/graphql/profile";
 import { toDateInputValue, toDayjs } from "@/shared/lib/date-ru";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
@@ -26,13 +25,11 @@ import { type ProfileSchema, profileSchema } from "./profile-schema";
 import { ProfileSection } from "./profile-section";
 
 type ProfileFormProps = {
-  profile: MyProfileQuery["myProfile"];
+  profile: MeQuery["me"];
 };
 
 export const ProfileForm = ({ profile }: ProfileFormProps) => {
-  const [updateMyProfile, { loading, error }] = useMutation(UPDATE_MY_PROFILE, {
-    refetchQueries: [ME],
-  });
+  const [updateMyProfile, { loading, error }] = useMutation(UPDATE_MY_PROFILE);
   const [saved, setSaved] = useState(false);
 
   const form = useForm<ProfileSchema>({
