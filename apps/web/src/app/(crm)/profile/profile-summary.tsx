@@ -1,6 +1,11 @@
-import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
+"use client";
+
+import { useApolloClient } from "@apollo/client/react";
+import { Box, CircularProgress, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { Camera } from "lucide-react";
+import { type ChangeEvent, useRef, useState } from "react";
 import type { MyProfileQuery } from "@/generated/graphql";
+import { uploadMyAvatar } from "@/shared/api/upload-user-avatar";
 import { formatFullName } from "@/shared/lib/person-name";
 import { RoleChip } from "@/shared/ui/role-chip";
 import { UserAvatar } from "@/shared/ui/user-avatar";
@@ -16,11 +21,47 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </Stack>
 );
 
+const MAX_AVATAR_SIZE = 1024 * 1024 * 10;
+
 type ProfileSummaryProps = {
   profile: MyProfileQuery["myProfile"];
 };
 
 export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const client = useApolloClient();
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > MAX_AVATAR_SIZE) {
+      setError("Файл больше 10 МБ. Выберите фото поменьше");
+      return;
+    }
+    setError(null);
+    try {
+      setUploading(true);
+      const { avatarUrl } = await uploadMyAvatar(file);
+      const cacheId = client.cache.identify({ __typename: "UserObject", id: profile.id });
+      if (!cacheId) return;
+      client.cache.modify({
+        id: cacheId,
+        fields: {
+          avatarUrl: () => avatarUrl,
+        },
+      });
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError("Не удалось загрузить аватар");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <Paper variant="outlined" sx={{ p: 3 }}>
       <Stack sx={{ gap: 2, alignItems: "center", textAlign: "center" }}>
@@ -40,13 +81,36 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
               "&:hover": {
                 bgcolor: "grey.800",
               },
+              "&.Mui-disabled": {
+                bgcolor: "grey.900",
+                color: "common.white",
+              },
               border: "3px solid",
               borderColor: "background.paper",
             }}
+            disabled={uploading}
+            aria-busy={uploading}
+            onClick={() => inputRef.current?.click()}
           >
-            <Camera size={16} strokeWidth={2} />
+            {uploading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <Camera size={16} strokeWidth={2} />
+            )}
           </IconButton>
+          <input
+            type="file"
+            ref={inputRef}
+            hidden
+            accept="image/png,image/jpeg,image/webp"
+            onChange={handleFileChange}
+          />
         </Box>
+        {error && (
+          <Typography variant="caption" color="error">
+            {error}
+          </Typography>
+        )}
         <Stack sx={{ gap: 0.5 }}>
           <Typography variant="h6" component="h1">
             {formatFullName(profile)}
