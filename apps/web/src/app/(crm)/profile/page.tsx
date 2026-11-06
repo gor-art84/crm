@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@apollo/client/react";
 import { Alert, Box, Skeleton } from "@mui/material";
-import { MY_PROFILE } from "@/shared/api/graphql/profile";
+import { ME } from "@/shared/api/graphql/me";
 import { ProfileForm } from "./profile-form";
 import { ProfileSummary } from "./profile-summary";
 
@@ -16,7 +16,7 @@ const gridSx = {
 } as const;
 
 export default function ProfilePage() {
-  const { data, loading, error } = useQuery(MY_PROFILE);
+  const { data, loading, error } = useQuery(ME);
 
   if (loading)
     return (
@@ -26,13 +26,13 @@ export default function ProfilePage() {
       </Box>
     );
   if (error) return <Alert severity="error">Не удалось загрузить профиль</Alert>;
-  if (!data?.myProfile) return null;
-  const { myProfile } = data;
+  if (!data?.me) return null;
+  const { me } = data;
 
   return (
     <Box sx={gridSx}>
-      <ProfileSummary profile={myProfile} />
-      <ProfileForm profile={myProfile} />
+      <ProfileSummary profile={me} />
+      <ProfileForm profile={me} />
     </Box>
   );
 }

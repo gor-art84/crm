@@ -1,6 +1,6 @@
-import { UnauthorizedException, UseGuards } from "@nestjs/common";
+import { UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
 import { EnvConfig } from "../config/env.schema.js";
 import { AuthService } from "./auth.service.js";
 import { CurrentSessionId } from "./decorators/current-session-id.decorator.js";
@@ -32,16 +32,6 @@ export class AuthResolver {
       maxAge: absoluteTimeoutSeconds * 1000,
     });
     return payload;
-  }
-
-  @UseGuards(SessionAuthGuard)
-  @Query(() => AuthPayload)
-  async me(@Context() context: GqlContext): Promise<AuthPayload> {
-    const userId = context.req.session?.userId;
-    if (!userId) {
-      throw new UnauthorizedException("Unauthorized");
-    }
-    return await this.authService.me(userId);
   }
 
   @Mutation(() => Boolean)
