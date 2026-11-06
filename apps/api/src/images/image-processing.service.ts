@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import sharp from "sharp";
 import { ImagePreset, ProcessedImage } from "./image.types.js";
 
 @Injectable()
 export class ImageProcessingService {
+  private readonly logger = new Logger(ImageProcessingService.name);
+
   async processImage(buffer: Buffer, preset: ImagePreset): Promise<ProcessedImage> {
     try {
       switch (preset) {
@@ -24,7 +26,11 @@ export class ImageProcessingService {
       }
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
-      throw new BadRequestException(`Не удалось обработать изображение: ${error}`);
+      this.logger.error(
+        "Image processing failed",
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw new BadRequestException("Не удалось обработать изображение");
     }
   }
 }
