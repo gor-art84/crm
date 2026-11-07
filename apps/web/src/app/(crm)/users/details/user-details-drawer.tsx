@@ -1,5 +1,3 @@
-"use client";
-
 import { Box, Button, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { X } from "lucide-react";
