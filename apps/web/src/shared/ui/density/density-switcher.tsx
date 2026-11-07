@@ -1,7 +1,7 @@
 "use client";
 import { ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
-import { Rows3, Rows4 } from "lucide-react";
 import type { Density } from "@/shared/lib/density";
+import { DENSITY_OPTIONS } from "./density-options";
 import { useDensity } from "./density-provider";
 
 export const DensitySwitcher = () => {
@@ -18,16 +18,13 @@ export const DensitySwitcher = () => {
       size="small"
       aria-label="Плотность интерфейса"
     >
-      <ToggleButton value="compact" aria-label="Компактно">
-        <Tooltip title="Компактно">
-          <Rows4 size={16} strokeWidth={1.75} />
-        </Tooltip>
-      </ToggleButton>
-      <ToggleButton value="default" aria-label="Обычно">
-        <Tooltip title="Обычно">
-          <Rows3 size={16} strokeWidth={1.75} />
-        </Tooltip>
-      </ToggleButton>
+      {DENSITY_OPTIONS.map(({ value, label, Icon }) => (
+        <ToggleButton key={value} value={value} aria-label={label}>
+          <Tooltip title={label}>
+            <Icon size={16} strokeWidth={1.75} />
+          </Tooltip>
+        </ToggleButton>
+      ))}
     </ToggleButtonGroup>
   );
 };

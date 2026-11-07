@@ -1,8 +1,6 @@
 "use client";
 import { Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme } from "@mui/material";
-import { Monitor, Moon, Sun } from "lucide-react";
-
-type ThemeMode = "system" | "light" | "dark";
+import { THEME_MODE_OPTIONS, type ThemeMode } from "./theme-mode-options";
 
 export const ThemeModeSwitcher = () => {
   const { mode, setMode } = useColorScheme();
@@ -19,21 +17,13 @@ export const ThemeModeSwitcher = () => {
       size="small"
       aria-label="Тема оформления"
     >
-      <ToggleButton value="system" aria-label="Как в системе">
-        <Tooltip title="Как в системе">
-          <Monitor size={16} strokeWidth={1.75} />
-        </Tooltip>
-      </ToggleButton>
-      <ToggleButton value="light" aria-label="Светлая тема">
-        <Tooltip title="Светлая тема">
-          <Sun size={16} strokeWidth={1.75} />
-        </Tooltip>
-      </ToggleButton>
-      <ToggleButton value="dark" aria-label="Тёмная тема">
-        <Tooltip title="Тёмная тема">
-          <Moon size={16} strokeWidth={1.75} />
-        </Tooltip>
-      </ToggleButton>
+      {THEME_MODE_OPTIONS.map(({ value, label, Icon }) => (
+        <ToggleButton key={value} value={value} aria-label={label}>
+          <Tooltip title={label}>
+            <Icon size={16} strokeWidth={1.75} />
+          </Tooltip>
+        </ToggleButton>
+      ))}
     </ToggleButtonGroup>
   );
 };
