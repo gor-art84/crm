@@ -10,7 +10,11 @@ type LoginFields = {
   password: string;
 };
 
-export function LoginForm() {
+type LoginFormProps = {
+  next: string;
+};
+
+export function LoginForm({ next }: LoginFormProps) {
   const router = useRouter();
 
   const [login, { loading, error }] = useMutation(LOGIN);
@@ -24,8 +28,10 @@ export function LoginForm() {
   const onSubmit = handleSubmit(async (values: LoginFields) => {
     try {
       await login({ variables: { input: values } });
-      router.push(`/`);
-    } catch {}
+      router.replace(next);
+    } catch {
+      // ошибка отображается через error из useMutation
+    }
   });
 
   return (
