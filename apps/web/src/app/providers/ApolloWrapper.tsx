@@ -1,6 +1,7 @@
 "use client";
 
-import { HttpLink } from "@apollo/client";
+import { ApolloLink, CombinedGraphQLErrors, HttpLink } from "@apollo/client";
+import { ErrorLink } from "@apollo/client/link/error";
 import {
   ApolloClient,
   ApolloNextAppProvider,
@@ -18,9 +19,26 @@ function makeClient() {
     },
   });
 
+  const errorLink = new ErrorLink(({ error, operation }) => {
+    if (!CombinedGraphQLErrors.is(error)) return;
+
+    const unauthenticated = error.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED");
+    if (!unauthenticated) return;
+
+    if (
+      typeof window === "undefined" ||
+      operation.operationName === "Login" ||
+      window.location.pathname === "/login"
+    )
+      return;
+
+    const next = window.location.pathname + window.location.search;
+    window.location.assign(`/login?next=${encodeURIComponent(next)}`);
+  });
+
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: httpLink,
+    link: ApolloLink.from([errorLink, httpLink]),
   });
 }
 

@@ -1,9 +1,15 @@
+import { safeNext } from "@/shared/lib/safe-next";
 import { LoginForm } from "./login-form";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{ next?: string | string[] }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { next } = await searchParams;
   return (
     <div>
-      <LoginForm />
+      <LoginForm next={safeNext(next)} />
     </div>
   );
 }
