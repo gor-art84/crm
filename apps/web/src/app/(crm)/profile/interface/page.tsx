@@ -1,9 +1,5 @@
-import { Typography } from "@mui/material";
+import { InterfaceSettings } from "./interface-settings";
 
 export default function ProfileInterfacePage() {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      Настройки интерфейса появятся здесь
-    </Typography>
-  );
+  return <InterfaceSettings />;
 }
