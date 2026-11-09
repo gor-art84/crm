@@ -1,7 +1,7 @@
 import { Divider, Paper } from "@mui/material";
-import { DensitySwitcher } from "@/shared/ui/density/density-switcher";
-import { ThemeModeSwitcher } from "@/shared/ui/theme/theme-mode-switcher";
 import { ProfileSection } from "../profile-section";
+import { DensityCards } from "./density-cards";
+import { ThemeModeCards } from "./theme-mode-cards";
 
 export const InterfaceSettings = () => {
   return (
@@ -10,7 +10,7 @@ export const InterfaceSettings = () => {
         title="Тема оформления"
         description="Применяется сразу, сохраняется на этом устройстве"
       >
-        <ThemeModeSwitcher />
+        <ThemeModeCards />
       </ProfileSection>
 
       <Divider />
@@ -19,7 +19,7 @@ export const InterfaceSettings = () => {
         title="Плотность интерфейса"
         description="Применяется сразу, сохраняется на этом устройстве"
       >
-        <DensitySwitcher />
+        <DensityCards />
       </ProfileSection>
     </Paper>
   );

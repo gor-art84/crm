@@ -10,5 +10,5 @@ export type DensityOption = {
 
 export const DENSITY_OPTIONS = [
   { value: "compact", label: "Компактно", description: "Больше строк на экране", Icon: Rows4 },
-  { value: "default", label: "Обычно", description: "Меньше строк на экране", Icon: Rows3 },
+  { value: "default", label: "Обычно", description: "Больше воздуха между строками", Icon: Rows3 },
 ] as const satisfies readonly DensityOption[];
