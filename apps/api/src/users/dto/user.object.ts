@@ -1,6 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { Role } from "../../generated/prisma/enums.js";
 import { InviteStatus } from "../../invites/invite-status.enum.js";
+import { UiDensity, UiThemeMode } from "../ui-settings.enums.js";
 
 @ObjectType()
 export class UserObject {
@@ -45,6 +46,12 @@ export class UserObject {
 
   @Field(() => String, { nullable: true })
   avatarUrl?: string | null;
+
+  @Field(() => UiThemeMode, { nullable: true })
+  themeMode: UiThemeMode | null;
+
+  @Field(() => UiDensity, { nullable: true })
+  density: UiDensity | null;
 
   @Field(() => Date, { nullable: true })
   createdAt?: Date | null;

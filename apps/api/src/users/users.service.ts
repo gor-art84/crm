@@ -19,6 +19,7 @@ import { PrismaService } from "../prisma/prisma.service.js";
 import { OBJECT_STORAGE, type ObjectStorage } from "../storage/object-storage.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
 import { UpdateMyProfileInput } from "./dto/update-my-profile.input.js";
+import { UpdateMyUiSettingsInput } from "./dto/update-my-ui-settings.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
 import { filterPermissionsBeyondRole } from "./user-permissions.js";
@@ -36,6 +37,8 @@ const userSelect = {
   maxAccount: true,
   jobTitle: true,
   avatarKey: true,
+  themeMode: true,
+  density: true,
   role: true,
   isActive: true,
 } satisfies Prisma.UserSelect;
@@ -336,6 +339,17 @@ export class UsersService {
   async updateMyProfile(userId: string, input: UpdateMyProfileInput): Promise<UserObject> {
     const user = await this.requireActiveUser(userId);
     return await this.update(user.id, input);
+  }
+
+  async updateMyUiSettings(userId: string, input: UpdateMyUiSettingsInput): Promise<UserObject> {
+    const user = await this.requireActiveUser(userId);
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: user.id },
+      data: input,
+      select: userObjectSelect,
+    });
+    return this.toUserObject(updatedUser);
   }
 
   async uploadMyAvatar(

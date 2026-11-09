@@ -1,5 +1,6 @@
 import { Field, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { Role } from "../../generated/prisma/enums.js";
+import { UiDensity, UiThemeMode } from "../../users/ui-settings.enums.js";
 
 registerEnumType(Role, {
   name: "Role",
@@ -21,4 +22,10 @@ export class AuthPayload {
 
   @Field(() => Role)
   role: Role;
+
+  @Field(() => UiThemeMode, { nullable: true })
+  themeMode: UiThemeMode | null;
+
+  @Field(() => UiDensity, { nullable: true })
+  density: UiDensity | null;
 }
