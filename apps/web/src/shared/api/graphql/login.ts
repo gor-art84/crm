@@ -8,6 +8,8 @@ export const LOGIN = gql(`
         lastName
         email
         role
+        themeMode
+        density
     }
   }
 `);
