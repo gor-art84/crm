@@ -359,4 +359,23 @@ export class UsersService {
     const user = await this.requireActiveUser(userId);
     return await this.uploadAvatar(user.id, file);
   }
+
+  async deleteMyAvatar(userId: string): Promise<UserObject> {
+    const user = await this.requireActiveUser(userId);
+    if (!user.avatarKey) return this.findMyProfile(userId);
+    const updatedUser = await this.prisma.user.update({
+      where: { id: user.id },
+      data: { avatarKey: null },
+      select: userObjectSelect,
+    });
+    try {
+      await this.storage.delete(user.avatarKey);
+    } catch (err) {
+      this.logger.error(
+        `Ошибка при удалении аватара ${user.avatarKey} для пользователя ${user.id}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+    return this.toUserObject(updatedUser);
+  }
 }
