@@ -25,7 +25,7 @@ export const THEME_MODE_TO_API = {
 } as const satisfies Record<ThemeMode, UiThemeMode>;
 
 export type LocalUiSettings = { themeMode: ThemeMode; density: Density };
-type ServerUiSettings = { themeMode: UiThemeMode | null; density: UiDensity | null };
+export type ServerUiSettings = { themeMode: UiThemeMode | null; density: UiDensity | null };
 export type UiSettingsPlan = {
   apply: Partial<LocalUiSettings>;
   push: UpdateMyUiSettingsInput;

@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { LOGIN } from "@/shared/api/graphql/login";
+import { useApplyUiSettings } from "@/shared/ui/ui-settings/use-apply-ui-settings";
 
 type LoginFields = {
   email: string;
@@ -16,6 +17,7 @@ type LoginFormProps = {
 
 export function LoginForm({ next }: LoginFormProps) {
   const router = useRouter();
+  const { applyUiSettings } = useApplyUiSettings();
 
   const [login, { loading, error }] = useMutation(LOGIN);
 
@@ -27,7 +29,8 @@ export function LoginForm({ next }: LoginFormProps) {
 
   const onSubmit = handleSubmit(async (values: LoginFields) => {
     try {
-      await login({ variables: { input: values } });
+      const { data } = await login({ variables: { input: values } });
+      if (data) applyUiSettings(data.login);
       router.replace(next);
     } catch {
       // ошибка отображается через error из useMutation
