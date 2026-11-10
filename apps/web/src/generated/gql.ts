@@ -20,10 +20,11 @@ type Documents = {
     "\n  query InvitePreview($token: String!) {\n    invitePreview(token: $token) {\n      email\n      firstName\n    }\n  }\n": typeof types.InvitePreviewDocument,
     "\n  mutation AcceptInvite($input: AcceptInviteInput!) {\n    acceptInvite(input: $input)\n  }\n": typeof types.AcceptInviteDocument,
     "\n  mutation ResendInvite($userId: String!) {\n    resendInvite(userId: $userId)\n  }\n": typeof types.ResendInviteDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": typeof types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n        themeMode\n        density\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n      themeMode\n      density\n    }\n  }\n": typeof types.MeDocument,
     "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n": typeof types.UpdateMyUiSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": typeof types.ChangePasswordDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.CreateUserDocument,
@@ -38,10 +39,11 @@ const documents: Documents = {
     "\n  query InvitePreview($token: String!) {\n    invitePreview(token: $token) {\n      email\n      firstName\n    }\n  }\n": types.InvitePreviewDocument,
     "\n  mutation AcceptInvite($input: AcceptInviteInput!) {\n    acceptInvite(input: $input)\n  }\n": types.AcceptInviteDocument,
     "\n  mutation ResendInvite($userId: String!) {\n    resendInvite(userId: $userId)\n  }\n": types.ResendInviteDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n": types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n        themeMode\n        density\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n      themeMode\n      density\n    }\n  }\n": types.MeDocument,
     "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n": types.UpdateMyUiSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": types.ChangePasswordDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.CreateUserDocument,
@@ -91,7 +93,7 @@ export function gql(source: "\n  mutation ResendInvite($userId: String!) {\n    
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n"): (typeof documents)["\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n    }\n  }\n"];
+export function gql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n        themeMode\n        density\n    }\n  }\n"): (typeof documents)["\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n        id\n        firstName\n        lastName\n        email\n        role\n        themeMode\n        density\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -99,11 +101,15 @@ export function gql(source: "\n  mutation Logout {\n    logout\n  }\n"): (typeof
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n"];
+export function gql(source: "\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n      themeMode\n      density\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n      themeMode\n      density\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

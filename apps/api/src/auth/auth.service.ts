@@ -36,6 +36,8 @@ export class AuthService implements OnModuleInit {
         passwordHash: true,
         role: true,
         isActive: true,
+        themeMode: true,
+        density: true,
       },
     });
 
@@ -54,6 +56,8 @@ export class AuthService implements OnModuleInit {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        themeMode: user.themeMode,
+        density: user.density,
       },
       sessionId,
     };

@@ -16,6 +16,8 @@ export const ME = gql(`
       whatsapp
       maxAccount
       birthDate
+      themeMode
+      density
     }
   }
 `);

@@ -14,13 +14,23 @@
     },
     "prisma:generate": {},
     "prisma:validate": {},
-    "prisma:migrate": {},
-    "prisma:studio": {},
+    "prisma:migrate": {
+      "cache": false
+    },
+    "prisma:studio": {
+      "cache": false,
+      "persistent": true
+    },
     "prisma:seed": {
       "cache": false,
       "env": ["DATABASE_URL", "ADMIN_EMAIL", "ADMIN_PASSWORD"]
     },
-    "codegen": {},
-    "codegen:watch": {}
+    "codegen": {
+      "cache": false
+    },
+    "codegen:watch": {
+      "cache": false,
+      "persistent": true
+    }
   }
 }
