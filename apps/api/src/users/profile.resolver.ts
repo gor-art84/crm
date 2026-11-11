@@ -34,4 +34,10 @@ export class ProfileResolver {
   ) {
     return this.usersService.updateMyUiSettings(userId, input);
   }
+
+  @Mutation(() => UserObject)
+  @UseGuards(SessionAuthGuard)
+  async deleteMyAvatar(@CurrentUserId() userId: string) {
+    return this.usersService.deleteMyAvatar(userId);
+  }
 }

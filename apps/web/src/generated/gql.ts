@@ -26,6 +26,7 @@ type Documents = {
     "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
     "\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n": typeof types.UpdateMyUiSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": typeof types.ChangePasswordDocument,
+    "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n": typeof types.DeleteMyAvatarDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.DeactivateUserDocument,
@@ -45,6 +46,7 @@ const documents: Documents = {
     "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      role\n      jobTitle\n      avatarUrl\n      phone\n      telegram\n      whatsapp\n      maxAccount\n      birthDate\n    }\n  }\n": types.UpdateMyProfileDocument,
     "\n  mutation UpdateMyUiSettings($input: UpdateMyUiSettingsInput!) {\n    updateMyUiSettings(input: $input) {\n      id\n      themeMode\n      density\n    }\n  }\n": types.UpdateMyUiSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": types.ChangePasswordDocument,
+    "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n": types.DeleteMyAvatarDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.DeactivateUserDocument,
@@ -114,6 +116,10 @@ export function gql(source: "\n  mutation UpdateMyUiSettings($input: UpdateMyUiS
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n"): (typeof documents)["\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n"): (typeof documents)["\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
