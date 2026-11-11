@@ -1,6 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Context, Int, Mutation, Resolver } from "@nestjs/graphql";
 import { EnvConfig } from "../config/env.schema.js";
 import { AuthService } from "./auth.service.js";
 import { CurrentSessionId } from "./decorators/current-session-id.decorator.js";
@@ -11,11 +11,13 @@ import { LoginInput } from "./dto/login.input.dto.js";
 import { type GqlContext } from "./gql-context.js";
 import { SessionAuthGuard } from "./guards/session-auth.guard.js";
 import { sessionCookieOptions } from "./session.js";
+import { SessionsService } from "./sessions.service.js";
 
 @Resolver()
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
+    private readonly sessionsService: SessionsService,
     private readonly configService: ConfigService<EnvConfig, true>,
   ) {}
 
@@ -54,5 +56,14 @@ export class AuthResolver {
     @Args("input") input: ChangePasswordInput,
   ): Promise<boolean> {
     return await this.authService.changePassword(userId, sessionId, input);
+  }
+
+  @Mutation(() => Int)
+  @UseGuards(SessionAuthGuard)
+  async revokeOtherSessions(
+    @CurrentSessionId() sessionId: string,
+    @CurrentUserId() userId: string,
+  ): Promise<number> {
+    return await this.sessionsService.revokeOtherSessions(userId, sessionId);
   }
 }

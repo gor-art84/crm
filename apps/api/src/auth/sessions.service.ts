@@ -81,12 +81,15 @@ export class SessionsService {
     await this.redisService.del(userSessionsKey(userId));
   }
 
-  async revokeOtherSessions(userId: string, currentSessionId: string) {
+  async revokeOtherSessions(userId: string, currentSessionId: string): Promise<number> {
     const userSessions = await this.redisService.sMembers(userSessionsKey(userId));
     const sessionsToRevoke = userSessions.filter((session) => session !== currentSessionId);
-    if (sessionsToRevoke.length > 0) {
-      await this.redisService.del(sessionsToRevoke.map((sessionId) => sessionKey(sessionId)));
-      await this.redisService.sRem(userSessionsKey(userId), sessionsToRevoke);
+    if (sessionsToRevoke.length === 0) {
+      return 0;
     }
+    const sessionKeys = sessionsToRevoke.map((sessionId) => sessionKey(sessionId));
+    const revokedCount = await this.redisService.del(sessionKeys);
+    await this.redisService.sRem(userSessionsKey(userId), sessionsToRevoke);
+    return revokedCount;
   }
 }
