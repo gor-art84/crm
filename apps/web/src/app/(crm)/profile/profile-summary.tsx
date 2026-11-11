@@ -1,12 +1,14 @@
 "use client";
 
-import { useApolloClient } from "@apollo/client/react";
-import { Box, CircularProgress, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { useApolloClient, useMutation } from "@apollo/client/react";
+import { Box, Button, CircularProgress, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { Camera } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
 import type { MeQuery } from "@/generated/graphql";
+import { DELETE_MY_AVATAR } from "@/shared/api/graphql/profile";
 import { uploadMyAvatar } from "@/shared/api/upload-user-avatar";
 import { formatFullName } from "@/shared/lib/person-name";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { RoleChip } from "@/shared/ui/role-chip";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 
@@ -31,6 +33,9 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteMyAvatar, { loading: deleting }] = useMutation(DELETE_MY_AVATAR);
 
   const client = useApolloClient();
 
@@ -62,6 +67,21 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
     }
   };
 
+  const openConfirm = () => {
+    setDeleteError(null);
+    setConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteMyAvatar();
+      setConfirmOpen(false);
+    } catch (err) {
+      if (err instanceof Error) setDeleteError(err.message);
+      else setDeleteError("Не удалось удалить аватар");
+    }
+  };
+
   return (
     <Paper variant="outlined" sx={{ p: 3 }}>
       <Stack sx={{ gap: 2, alignItems: "center", textAlign: "center" }}>
@@ -89,7 +109,7 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
               border: "3px solid",
               borderColor: "background.paper",
             }}
-            disabled={uploading}
+            disabled={uploading || deleting}
             aria-busy={uploading}
             onClick={() => inputRef.current?.click()}
           >
@@ -107,6 +127,11 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
             onChange={handleFileChange}
           />
         </Box>
+        {profile.avatarUrl && (
+          <Button size="small" color="inherit" onClick={openConfirm} disabled={uploading}>
+            Удалить фото
+          </Button>
+        )}
         {error && (
           <Typography variant="caption" color="error">
             {error}
@@ -140,6 +165,16 @@ export const ProfileSummary = ({ profile }: ProfileSummaryProps) => {
           </Typography>
         </Stack>
       </Stack>
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Удалить фото профиля?"
+        description="Вместо фото будут показаны инициалы"
+        confirmLabel="Удалить"
+        loading={deleting}
+        error={deleteError}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleDelete}
+      />
     </Paper>
   );
 };

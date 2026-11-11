@@ -35,3 +35,12 @@ export const CHANGE_PASSWORD = gql(`
     changePassword(input: $input)
   }
 `);
+
+export const DELETE_MY_AVATAR = gql(`
+  mutation DeleteMyAvatar {
+    deleteMyAvatar {
+      id
+      avatarUrl
+    }
+  }
+`);
