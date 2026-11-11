@@ -44,3 +44,9 @@ export const DELETE_MY_AVATAR = gql(`
     }
   }
 `);
+
+export const REVOKE_OTHER_SESSIONS = gql(`
+  mutation RevokeOtherSessions {
+    revokeOtherSessions
+  }
+`);
