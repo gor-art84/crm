@@ -14,7 +14,8 @@
       "!**/.next",
       "!**/coverage",
       "!**/.prisma",
-      "!**/generated"
+      "!**/generated",
+      "!**/schema.gql"
     ]
   },
   "formatter": {

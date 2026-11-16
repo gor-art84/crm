@@ -1,0 +1,284 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input AcceptInviteInput {
+  password: String!
+  token: String!
+}
+
+type AuthPayload {
+  density: UiDensity
+  email: String!
+  firstName: String!
+  id: String!
+  lastName: String!
+  role: Role!
+  themeMode: UiThemeMode
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+type ClientLookupObject {
+  clients: [ClientObject!]!
+  parties: [PartyObject!]!
+}
+
+type ClientObject {
+  actualAddress: String
+  createdAt: DateTime!
+  directorName: String
+  directorPosition: String
+  email: String
+  employeeCount: Int
+  firstName: String
+  fullName: String!
+  id: String!
+  inn: String
+  kpp: String
+  lastName: String
+  legalAddress: String
+  middleName: String
+  ogrn: String
+  okpo: String
+  okved: String
+  phone: String
+  shortName: String
+  status: PartyStatus
+  type: ClientType!
+  updatedAt: DateTime!
+  website: String
+}
+
+enum ClientType {
+  INDIVIDUAL
+  INDIVIDUAL_ENTREPRENEUR
+  LEGAL_ENTITY
+}
+
+input CreateClientInput {
+  actualAddress: String
+  captureDadata: Boolean
+  directorName: String
+  directorPosition: String
+  email: String
+  employeeCount: Int
+  firstName: String
+  fullName: String!
+  inn: String
+  kpp: String
+  lastName: String
+  legalAddress: String
+  middleName: String
+  ogrn: String
+  okpo: String
+  okved: String
+  phone: String
+  shortName: String
+  status: PartyStatus
+  type: ClientType!
+  website: String
+}
+
+input CreateUserInput {
+  birthDate: DateTime
+  email: String!
+  extraPermissions: [Permission!]
+  firstName: String!
+  jobTitle: String
+  lastName: String!
+  maxAccount: String
+  middleName: String
+  phone: String
+  role: Role!
+  telegram: String
+  whatsapp: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FioCleanResult {
+  gender: String
+  name: String
+  patronymic: String
+  qc: Int
+  result: String!
+  surname: String
+}
+
+type FioSuggestionObject {
+  name: String
+  patronymic: String
+  surname: String
+  value: String!
+}
+
+type InvitePreviewObject {
+  email: String!
+  firstName: String!
+}
+
+enum InviteStatus {
+  ACCEPTED
+  EXPIRED
+  PENDING
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  acceptInvite(input: AcceptInviteInput!): Boolean!
+  activateUser(userId: String!): UserObject!
+  changePassword(input: ChangePasswordInput!): Boolean!
+  createClient(createClientInput: CreateClientInput!): ClientObject!
+  createUser(createUserInput: CreateUserInput!): UserObject!
+  deactivateUser(userId: String!): UserObject!
+  deleteMyAvatar: UserObject!
+  login(input: LoginInput!): AuthPayload!
+  logout: Boolean!
+  resendInvite(userId: String!): Boolean!
+  revokeOtherSessions: Int!
+  revokeSession(id: ID!): Boolean!
+  updateMyProfile(input: UpdateMyProfileInput!): UserObject!
+  updateMyUiSettings(input: UpdateMyUiSettingsInput!): UserObject!
+  updateUser(updateUserInput: UpdateUserInput!, userId: String!): UserObject!
+}
+
+type PartyObject {
+  directorName: String
+  directorPosition: String
+  email: String
+  employeeCount: Int
+  fullName: String!
+  inn: String!
+  kpp: String
+  legalAddress: String
+  ogrn: String
+  okpo: String
+  okved: String
+  phone: String
+  shortName: String
+  status: PartyStatus
+  type: ClientType!
+  website: String
+}
+
+enum PartyStatus {
+  ACTIVE
+  BANKRUPT
+  LIQUIDATED
+  LIQUIDATING
+  REORGANIZING
+}
+
+enum Permission {
+  CLIENTS_READ
+  CLIENTS_WRITE
+  DEALS_READ
+  DEALS_WRITE
+  PROGRAMS_READ
+  PROGRAMS_WRITE
+  USERS_READ
+  USERS_WRITE
+}
+
+type Query {
+  cleanFio(query: String!): FioCleanResult!
+  clients: [ClientObject!]!
+  fioSuggestions(count: Int, query: String!): [FioSuggestionObject!]!
+  hello: String!
+  invitePreview(token: String!): InvitePreviewObject!
+  lookup(inn: String!): ClientLookupObject!
+  me: UserObject!
+  mySessions: [SessionObject!]!
+  partyByInn(inn: String!): [PartyObject!]!
+  users: [UserObject!]!
+}
+
+enum Role {
+  ADMINISTRATOR
+  MANAGER
+  METHODIST
+}
+
+type SessionObject {
+  browser: String
+  deviceType: String
+  id: ID!
+  isCurrent: Boolean!
+  issuedAt: DateTime!
+  os: String
+}
+
+enum UiDensity {
+  COMPACT
+  DEFAULT
+}
+
+enum UiThemeMode {
+  DARK
+  LIGHT
+  SYSTEM
+}
+
+input UpdateMyProfileInput {
+  birthDate: DateTime
+  firstName: String
+  lastName: String
+  maxAccount: String
+  middleName: String
+  phone: String
+  telegram: String
+  whatsapp: String
+}
+
+input UpdateMyUiSettingsInput {
+  density: UiDensity
+  themeMode: UiThemeMode
+}
+
+input UpdateUserInput {
+  birthDate: DateTime
+  email: String
+  extraPermissions: [Permission!]
+  firstName: String
+  jobTitle: String
+  lastName: String
+  maxAccount: String
+  middleName: String
+  phone: String
+  role: Role
+  telegram: String
+  whatsapp: String
+}
+
+type UserObject {
+  avatarUrl: String
+  birthDate: DateTime
+  createdAt: DateTime
+  density: UiDensity
+  email: String!
+  firstName: String!
+  id: String!
+  inviteStatus: InviteStatus!
+  isActive: Boolean!
+  jobTitle: String
+  lastName: String!
+  maxAccount: String
+  middleName: String
+  phone: String
+  role: Role!
+  telegram: String
+  themeMode: UiThemeMode
+  updatedAt: DateTime
+  whatsapp: String
+}
