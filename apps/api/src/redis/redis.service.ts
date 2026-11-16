@@ -55,4 +55,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   sMembers(key: string) {
     return this.client.sMembers(key);
   }
+
+  mGet(keys: string[]) {
+    return this.client.mGet(keys);
+  }
 }

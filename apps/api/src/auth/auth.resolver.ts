@@ -1,6 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Args, Context, Int, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Context, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { EnvConfig } from "../config/env.schema.js";
 import { AuthService } from "./auth.service.js";
 import { CurrentSessionId } from "./decorators/current-session-id.decorator.js";
@@ -8,6 +8,7 @@ import { CurrentUserId } from "./decorators/current-user-id.decorator.js";
 import { AuthPayload } from "./dto/auth.payload.js";
 import { ChangePasswordInput } from "./dto/change-password.input.js";
 import { LoginInput } from "./dto/login.input.dto.js";
+import { SessionObject } from "./dto/session.object.js";
 import { type GqlContext } from "./gql-context.js";
 import { SessionAuthGuard } from "./guards/session-auth.guard.js";
 import { sessionCookieOptions } from "./session.js";
@@ -28,7 +29,10 @@ export class AuthResolver {
       infer: true,
     });
 
-    const { payload, sessionId } = await this.authService.login(input);
+    const { payload, sessionId } = await this.authService.login(
+      input,
+      context.req.headers["user-agent"],
+    );
     context.res.cookie(cookieName, sessionId, {
       ...sessionCookieOptions(this.configService.get("NODE_ENV", { infer: true }) === "production"),
       maxAge: absoluteTimeoutSeconds * 1000,
@@ -65,5 +69,24 @@ export class AuthResolver {
     @CurrentUserId() userId: string,
   ): Promise<number> {
     return await this.sessionsService.revokeOtherSessions(userId, sessionId);
+  }
+
+  @Query(() => [SessionObject])
+  @UseGuards(SessionAuthGuard)
+  async mySessions(
+    @CurrentSessionId() sessionId: string,
+    @CurrentUserId() userId: string,
+  ): Promise<SessionObject[]> {
+    return await this.sessionsService.listSessions(userId, sessionId);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(SessionAuthGuard)
+  async revokeSession(
+    @CurrentUserId() userId: string,
+    @CurrentSessionId() sessionId: string,
+    @Args("id", { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    return await this.sessionsService.revokeSession(userId, sessionId, id);
   }
 }

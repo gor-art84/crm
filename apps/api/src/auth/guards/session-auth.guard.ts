@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { ConfigService } from "@nestjs/config";
 import { EnvConfig } from "../../config/env.schema.js";
 import { getRequest } from "../get-request.js";
+import { isSessionExpired } from "../session.js";
 import { SessionsService } from "../sessions.service.js";
 
 @Injectable()
@@ -27,10 +28,7 @@ export class SessionAuthGuard implements CanActivate {
       throw new UnauthorizedException("Unauthorized");
     }
 
-    const { issuedAt } = session;
-
-    const issuedAtMs = Date.parse(issuedAt);
-    if (!Number.isFinite(issuedAtMs) || (Date.now() - issuedAtMs) / 1000 > absoluteTimeoutSeconds) {
+    if (isSessionExpired(session.issuedAt, absoluteTimeoutSeconds)) {
       await this.sessionsService.deleteSession(sessionId);
       throw new UnauthorizedException("Unauthorized");
     }
