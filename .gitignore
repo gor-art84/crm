@@ -40,3 +40,4 @@ next-env.d.ts
 .claude/
 .windsurf/
 skills-lock.json
+/crm-api/http/http-client.private.env.json
