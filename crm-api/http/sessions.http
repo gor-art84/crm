@@ -1,0 +1,23 @@
+### 1. Логин (cookie сохранится автоматически)
+GRAPHQL {{host}}/graphql
+
+mutation Login($input: LoginInput!) {
+    login(input: $input) {
+        id
+        email
+    }
+}
+
+{
+  "input": {"email":  "{{email}}", "password": "{{password}}"}
+}
+
+### 2. Список сеансов + сохраняем id «чужой» сессии
+GRAPHQL {{host}}/graphql
+
+query { mySessions { id isCurrent issuedAt browser os deviceType } }
+
+### 3. Завершить текущую → BAD_USER_INPUT
+GRAPHQL {{host}}/graphql
+
+mutation { revokeSession(id: "226d0a0a925a3fc25bcc27f32d6f16832d0feca7e46212fe1efd8a8a4169b61f") }

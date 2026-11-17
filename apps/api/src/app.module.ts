@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
@@ -26,7 +27,7 @@ import { UsersModule } from "./users/users.module.js";
       validationSchema: envSchema,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      autoSchemaFile: true,
+      autoSchemaFile: join(process.cwd(), "schema.gql"),
       sortSchema: true,
       driver: ApolloDriver,
       context: ({ req, res }: { req: Request; res: Response }) => ({ req, res }),

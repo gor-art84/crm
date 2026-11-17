@@ -21,7 +21,10 @@ export class AuthService implements OnModuleInit {
     this.fakeHash = await argon2.hash(randomBytes(32));
   }
 
-  async login(dto: LoginInput): Promise<{ payload: AuthPayload; sessionId: string }> {
+  async login(
+    dto: LoginInput,
+    userAgent?: string,
+  ): Promise<{ payload: AuthPayload; sessionId: string }> {
     const { email, password } = dto;
 
     const user = await this.prismaService.user.findUnique({
@@ -47,7 +50,7 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException("Недействительные учетные данные");
     }
 
-    const sessionId = await this.sessionsService.createSession(user.id);
+    const sessionId = await this.sessionsService.createSession(user.id, userAgent);
 
     return {
       payload: {
