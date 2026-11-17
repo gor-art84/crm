@@ -1,14 +1,20 @@
 "use client";
 
 import { useMutation } from "@apollo/client/react";
-import { Alert, Button, Paper, Snackbar } from "@mui/material";
+import { Alert, Button, Snackbar, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { REVOKE_OTHER_SESSIONS } from "@/shared/api/graphql/profile";
+import { MY_SESSIONS } from "@/shared/api/graphql/sessions";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { ProfileSection } from "../profile-section";
 
-export const OtherSessions = () => {
-  const [revokeOtherSessions, { loading }] = useMutation(REVOKE_OTHER_SESSIONS);
+type OtherSessionsProps = {
+  disabled: boolean;
+};
+
+export const OtherSessions = ({ disabled }: OtherSessionsProps) => {
+  const [revokeOtherSessions, { loading }] = useMutation(REVOKE_OTHER_SESSIONS, {
+    refetchQueries: [{ query: MY_SESSIONS }],
+  });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState(0);
@@ -37,12 +43,17 @@ export const OtherSessions = () => {
   const message = result > 0 ? `Завершено сеансов: ${result}` : "Других активных сеансов нет";
 
   return (
-    <Paper variant="outlined">
-      <ProfileSection title="Другие устройства" description="Завершить все сеансы, кроме текущего">
-        <Button onClick={openConfirm} variant="outlined">
+    <>
+      <Stack sx={{ gap: 0.5, alignItems: "flex-start" }}>
+        <Button onClick={openConfirm} variant="outlined" disabled={disabled}>
           Выйти на всех других устройствах
         </Button>
-      </ProfileSection>
+        {disabled && (
+          <Typography variant="caption" color="text.secondary">
+            Других активных сеансов нет
+          </Typography>
+        )}
+      </Stack>
       <ConfirmDialog
         open={confirmOpen}
         title="Выйти на других устройствах"
@@ -61,6 +72,6 @@ export const OtherSessions = () => {
       >
         <Alert severity="success">{message}</Alert>
       </Snackbar>
-    </Paper>
+    </>
   );
 };
