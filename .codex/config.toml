@@ -1,0 +1,18 @@
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+
+[mcp_servers.mui]
+command = "pnpm"
+args = [
+    "--silent",
+    "dlx",
+    "@mui/mcp@latest",
+]
+
+[mcp_servers.next-devtools]
+command = "pnpm"
+args = [
+    "--silent",
+    "dlx",
+    "next-devtools-mcp@latest",
+]
