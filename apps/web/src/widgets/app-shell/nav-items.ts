@@ -3,6 +3,7 @@ import type { Role } from "@/generated/graphql";
 
 type NavItem = {
   label: string;
+  mobileLabel?: string;
   href: string;
   icon: LucideIcon;
   roles: Role[];
@@ -30,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     href: "/users",
     label: "Пользователи",
+    mobileLabel: "Команда",
     icon: Users,
     roles: ["ADMINISTRATOR"],
   },
