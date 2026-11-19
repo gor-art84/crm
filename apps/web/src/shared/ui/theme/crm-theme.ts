@@ -299,5 +299,16 @@ export const crmTheme = createTheme({
         }),
       },
     },
+    MuiSnackbar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          [theme.breakpoints.down("md")]: {
+            "&.MuiSnackbar-anchorOriginBottomRight": {
+              bottom: "calc(96px + env(safe-area-inset-bottom, 0px))",
+            },
+          },
+        }),
+      },
+    },
   },
 });
