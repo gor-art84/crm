@@ -15,7 +15,9 @@ export const crmTheme = createTheme({
     light: {
       palette: {
         primary: {
-          main: "#1D5C6B",
+          main: "#247C78",
+          light: "#4F9992",
+          dark: "#1C6663",
           contrastText: "#FFFFFF",
         },
         text: {
@@ -61,8 +63,10 @@ export const crmTheme = createTheme({
     dark: {
       palette: {
         primary: {
-          main: "#7CC0CF",
-          contrastText: "#08222A",
+          main: "#7ACBC3",
+          light: "#A4DDD7",
+          dark: "#52ADA5",
+          contrastText: "#0C2927",
         },
         text: {
           primary: "#ECEDF0",
