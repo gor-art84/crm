@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, InputAdornment, MenuItem, Stack, TextField } from "@mui/material";
+import { Box, Button, InputAdornment, MenuItem, TextField } from "@mui/material";
 import { Search } from "lucide-react";
 import { ROLE_LABELS } from "@/shared/model/roles";
 import type { UsersFiltersType } from "./filter-users";
@@ -13,11 +13,24 @@ type UsersFiltersProps = {
 export const UsersFilters = ({ value, onChange }: UsersFiltersProps) => {
   const hasActiveFilters = Boolean(value.q.trim() || value.role || value.status);
   return (
-    <Stack direction="row" sx={{ gap: 1.5, flexWrap: "wrap", alignItems: "center" }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "repeat(2, minmax(0, 1fr))",
+          md: hasActiveFilters
+            ? "minmax(220px, 1fr) 180px 160px auto"
+            : "minmax(220px, 1fr) 180px 160px",
+        },
+        gap: 1.5,
+        alignItems: "center",
+      }}
+    >
       <TextField
         size="small"
-        placeholder="Поиск по имени или email"
-        sx={{ width: 240 }}
+        placeholder="Имя или email"
+        sx={{ minWidth: 0, width: "100%", gridColumn: { xs: "1 / -1", md: "auto" } }}
+        label="Поиск"
         value={value.q}
         onChange={(event) => {
           onChange({ ...value, q: event.target.value });
@@ -40,7 +53,7 @@ export const UsersFilters = ({ value, onChange }: UsersFiltersProps) => {
         onChange={(event) =>
           onChange({ ...value, role: event.target.value as UsersFiltersType["role"] })
         }
-        sx={{ minWidth: 180 }}
+        sx={{ minWidth: 0, width: "100%" }}
       >
         <MenuItem value="">Все роли</MenuItem>
         {Object.entries(ROLE_LABELS).map(([role, label]) => (
@@ -60,7 +73,7 @@ export const UsersFilters = ({ value, onChange }: UsersFiltersProps) => {
             status: event.target.value as UsersFiltersType["status"],
           })
         }
-        sx={{ minWidth: 160 }}
+        sx={{ minWidth: 0, width: "100%" }}
       >
         <MenuItem value="">Все</MenuItem>
         <MenuItem value="active">Активен</MenuItem>
@@ -72,10 +85,14 @@ export const UsersFilters = ({ value, onChange }: UsersFiltersProps) => {
           variant="text"
           color="inherit"
           onClick={() => onChange({ q: "", role: "", status: "" })}
+          sx={{
+            gridColumn: { xs: "1 / -1", md: "auto" },
+            justifySelf: "start",
+          }}
         >
           Сбросить
         </Button>
       )}
-    </Stack>
+    </Box>
   );
 };
