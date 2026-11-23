@@ -34,29 +34,25 @@ export const SidebarNav = () => {
               aria-current={isActive ? "page" : undefined}
               aria-label={item.label}
               sx={{
-                borderRadius: "999px",
-                border: "1px solid transparent",
+                borderRadius: "12px",
                 "&.Mui-selected": {
-                  color: "primary.main",
-                  borderColor: "divider",
-                  bgcolor: "action.selected",
-                  backgroundImage:
-                    "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0))",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18)",
+                  color: "primary.contrastText",
+                  bgcolor: "primary.main",
                 },
                 "&.Mui-selected:hover": {
-                  bgcolor: "action.selected",
+                  bgcolor: "primary.dark",
                 },
                 "&.Mui-focusVisible": {
                   outline: "2px solid",
                   outlineColor: "primary.main",
                   outlineOffset: -2,
                 },
+                "&.Mui-selected.Mui-focusVisible": {
+                  outlineColor: "primary.contrastText",
+                  outlineOffset: -4,
+                },
                 transition: (theme) =>
-                  theme.transitions.create(
-                    ["background-color", "border-color", "box-shadow", "color"],
-                    { duration: 150 },
-                  ),
+                  theme.transitions.create(["background-color", "color"], { duration: 150 }),
                 "@media (prefers-reduced-motion: reduce)": {
                   transition: "none",
                 },

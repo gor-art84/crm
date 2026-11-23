@@ -55,7 +55,16 @@ export const Sidebar = () => {
             style={{ flexShrink: 0 }}
           />
         </Stack>
-        <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", p: 0 }}>
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            p: 0,
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
           <SidebarNav />
         </Box>
 
