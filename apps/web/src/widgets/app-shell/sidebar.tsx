@@ -23,8 +23,8 @@ export const Sidebar = () => {
           pointerEvents: "none",
           zIndex: 0,
           backgroundImage: [
-            "radial-gradient(ellipse at 15% 20%, rgba(var(--mui-palette-primary-mainChannel) / 0.28), transparent 65%)",
-            "radial-gradient(ellipse at 90% 85%, rgba(var(--mui-palette-primary-mainChannel) / 0.16), transparent 60%)",
+            "radial-gradient(ellipse at 15% 20%, rgba(var(--mui-palette-primary-mainChannel) / 0.08), transparent 65%)",
+            "radial-gradient(ellipse at 90% 85%, rgba(var(--mui-palette-primary-mainChannel) / 0.04), transparent 60%)",
           ].join(", "),
         },
       }}
@@ -43,6 +43,12 @@ export const Sidebar = () => {
           gap: 1.5,
           borderRadius: "inherit",
           overflow: "hidden",
+          "&&": {
+            boxShadow: [
+              "inset 0 1px 0 rgba(255, 255, 255, 0.3)",
+              "0 4px 16px rgba(0, 0, 0, 0.04)",
+            ].join(", "),
+          },
         }}
       >
         <Stack sx={{ alignItems: "center", py: 1, flexShrink: 0 }}>
