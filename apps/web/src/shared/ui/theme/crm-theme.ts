@@ -26,7 +26,7 @@ export const crmTheme = createTheme({
           disabled: "#8A909C",
         },
         background: {
-          default: "#F5F6F8",
+          default: "#F6F8FA",
           paper: "#FFFFFF",
         },
         divider: "#E3E6EB",
@@ -252,12 +252,12 @@ export const crmTheme = createTheme({
       styleOverrides: (theme) => ({
         body: {
           backgroundImage:
-            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.22), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.16), transparent 55%)",
+            "radial-gradient(circle at 0% 0%, rgba(139, 164, 228, 0.16), transparent 50%), radial-gradient(circle at 100% 100%, rgba(150, 198, 180, 0.14), transparent 55%)",
           backgroundAttachment: "fixed",
           minHeight: "100vh",
           ...theme.applyStyles("dark", {
             backgroundImage:
-              "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.07), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.05), transparent 55%)",
+              "radial-gradient(circle at 0% 0%, rgba(139, 164, 228, 0.07), transparent 50%), radial-gradient(circle at 100% 100%, rgba(150, 198, 180, 0.05), transparent 55%)",
           }),
         },
         ":root": {
