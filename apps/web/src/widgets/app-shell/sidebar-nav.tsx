@@ -1,17 +1,13 @@
 "use client";
 
 import { useQuery } from "@apollo/client/react";
-import { List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from "@mui/material";
+import { List, ListItemButton, ListItemIcon, Tooltip } from "@mui/material";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ME } from "@/shared/api/graphql/me";
 import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 
-type SidebarNavProps = {
-  collapsed: boolean;
-};
-
-export const SidebarNav = ({ collapsed }: SidebarNavProps) => {
+export const SidebarNav = () => {
   const { data } = useQuery(ME);
   const path = usePathname();
 
@@ -30,7 +26,7 @@ export const SidebarNav = ({ collapsed }: SidebarNavProps) => {
         const isActive = isNavItemActive(item, path);
         const Icon = item.icon;
         return (
-          <Tooltip key={item.href} title={collapsed ? item.label : ""} placement="right">
+          <Tooltip key={item.href} title={item.label} placement="right">
             <ListItemButton
               component={Link}
               href={item.href}
@@ -54,7 +50,7 @@ export const SidebarNav = ({ collapsed }: SidebarNavProps) => {
                 "&.Mui-focusVisible": {
                   outline: "2px solid",
                   outlineColor: "primary.main",
-                  outlineOffset: 2,
+                  outlineOffset: -2,
                 },
                 transition: (theme) =>
                   theme.transitions.create(
@@ -64,16 +60,17 @@ export const SidebarNav = ({ collapsed }: SidebarNavProps) => {
                 "@media (prefers-reduced-motion: reduce)": {
                   transition: "none",
                 },
-                justifyContent: collapsed ? "center" : "flex-start",
-                px: collapsed ? 0 : 1.25,
-                gap: collapsed ? 0 : 1.25,
-                minHeight: collapsed ? 40 : "var(--crm-nav-h)",
+                justifyContent: "center",
+                px: 0,
+                gap: 0,
+                minHeight: 44,
+                width: 44,
+                mx: "auto",
               }}
             >
               <ListItemIcon sx={{ minWidth: 0, color: "inherit" }}>
                 <Icon size={18} strokeWidth={1.75} />
               </ListItemIcon>
-              {!collapsed && <ListItemText primary={item.label} />}
             </ListItemButton>
           </Tooltip>
         );

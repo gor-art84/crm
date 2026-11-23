@@ -35,8 +35,8 @@ export const LogoutButton = () => {
             size="small"
             sx={{
               color: "text.secondary",
-              minWidth: { xs: 44, md: 28 },
-              minHeight: { xs: 44, md: 28 },
+              minWidth: 44,
+              minHeight: 44,
             }}
           >
             <LogOut size={18} strokeWidth={1.75} />
