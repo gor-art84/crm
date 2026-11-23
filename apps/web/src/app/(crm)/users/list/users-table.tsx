@@ -12,10 +12,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { UserStatus } from "@/app/(crm)/users/ui/user-status";
 import type { GetUsersQuery } from "@/generated/graphql";
 import { formatFullName } from "@/shared/lib/person-name";
-import { RoleChip } from "@/shared/ui/role-chip";
-import { StatusChip } from "@/shared/ui/status-chip";
+import { ROLE_LABELS } from "@/shared/model/roles";
 import { UserAvatar } from "@/shared/ui/user-avatar";
 import { getUserStatus } from "../model/get-user-status";
 import type { UserRow } from "../ui/user-row";
@@ -115,10 +115,18 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <RoleChip role={user.role} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {ROLE_LABELS[user.role]}
+                  </Typography>
                 </TableCell>
                 <TableCell>
-                  <StatusChip {...getUserStatus(user)} />
+                  <UserStatus {...getUserStatus(user)} />
                 </TableCell>
               </TableRow>
             );
