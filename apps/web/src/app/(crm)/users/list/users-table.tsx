@@ -1,5 +1,6 @@
 import {
   Box,
+  ButtonBase,
   Paper,
   Stack,
   Table,
@@ -8,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type { GetUsersQuery } from "@/generated/graphql";
@@ -36,22 +38,75 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
         </TableHead>
         <TableBody>
           {users.map((user) => {
+            const fullName = formatFullName(user).trim() || user.email.trim() || "Без имени";
             return (
-              <TableRow hover key={user.id} onClick={() => onOpen(user)} sx={{ cursor: "pointer" }}>
+              <TableRow
+                hover
+                key={user.id}
+                onClick={() => onOpen(user)}
+                sx={{
+                  cursor: "pointer",
+                  "& > td": {
+                    height: 64,
+                    py: 1,
+                  },
+                  'html[data-density="compact"] & > td': {
+                    height: 56,
+                    py: 0.75,
+                  },
+                }}
+              >
                 <TableCell>
                   <Stack direction="row" sx={{ gap: 1.5, alignItems: "center" }}>
                     <UserAvatar user={user} size={32} />
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                        {formatFullName(user)}
-                      </Typography>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Tooltip title={fullName} placement="top-start">
+                        <ButtonBase
+                          component="button"
+                          type="button"
+                          aria-label={`Открыть карточку пользователя ${fullName}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onOpen(user);
+                          }}
+                          sx={{
+                            width: "100%",
+                            minWidth: 0,
+                            minHeight: 24,
+                            justifyContent: "flex-start",
+                            textAlign: "left",
+                            borderRadius: "4px",
+                            "&:hover": {
+                              color: "primary.main",
+                            },
+                            "&.Mui-focusVisible": {
+                              outline: "2px solid",
+                              outlineColor: "primary.main",
+                              outlineOffset: -2,
+                            },
+                          }}
+                        >
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            noWrap
+                            sx={{
+                              fontWeight: 500,
+                              minWidth: 0,
+                              maxWidth: "100%",
+                            }}
+                          >
+                            {fullName}
+                          </Typography>
+                        </ButtonBase>
+                      </Tooltip>
                       <Typography
                         variant="caption"
-                        color="text.secondary"
                         noWrap
+                        title={user.email}
                         sx={{
                           display: "block",
-                          'html[data-density="compact"] &': { display: "none" },
+                          color: "text.secondary",
                         }}
                       >
                         {user.email}
