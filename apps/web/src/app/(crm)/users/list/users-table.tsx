@@ -32,7 +32,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
         size="small"
         sx={(theme) => ({
           tableLayout: "fixed",
-          minWidth: "640px",
+          minWidth: { xs: "0px", md: "640px" },
           "& .MuiTableCell-root": {
             borderBottomColor: `color-mix(in srgb, ${theme.vars.palette.divider} 60%, transparent)`,
           },
@@ -57,8 +57,22 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
         >
           <TableRow>
             <TableCell>Пользователь</TableCell>
-            <TableCell sx={{ width: { xs: "160px", lg: "22%" } }}>Роль</TableCell>
-            <TableCell sx={{ width: { xs: "180px", lg: "24%" } }}>Статус</TableCell>
+            <TableCell
+              sx={{
+                display: { xs: "none", md: "table-cell" },
+                width: { md: "160px", lg: "22%" },
+              }}
+            >
+              Роль
+            </TableCell>
+            <TableCell
+              sx={{
+                display: { xs: "none", md: "table-cell" },
+                width: { md: "180px", lg: "24%" },
+              }}
+            >
+              Статус
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -136,10 +150,26 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                       >
                         {user.email}
                       </Typography>
+                      <Stack
+                        direction="row"
+                        sx={{
+                          display: { xs: "flex", md: "none" },
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          columnGap: 1.5,
+                          rowGap: 0.5,
+                          mt: 0.5,
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          {ROLE_LABELS[user.role]}
+                        </Typography>
+                        <UserStatus {...getUserStatus(user)} />
+                      </Stack>
                     </Box>
                   </Stack>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
                   <Typography
                     variant="body2"
                     sx={{
@@ -150,7 +180,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
                     {ROLE_LABELS[user.role]}
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
                   <UserStatus {...getUserStatus(user)} />
                 </TableCell>
               </TableRow>
