@@ -57,8 +57,8 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
         >
           <TableRow>
             <TableCell>Пользователь</TableCell>
-            <TableCell width={160}>Роль</TableCell>
-            <TableCell width={180}>Статус</TableCell>
+            <TableCell sx={{ width: { xs: "160px", lg: "22%" } }}>Роль</TableCell>
+            <TableCell sx={{ width: { xs: "180px", lg: "24%" } }}>Статус</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
