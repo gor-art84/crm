@@ -176,7 +176,7 @@ export const UsersList = () => {
   const mutationError = deactivateError ?? activateError ?? resendError;
 
   return (
-    <Stack sx={{ gap: 2 }}>
+    <Stack sx={{ gap: 2, mt: -2 }}>
       <Box
         component="section"
         aria-label="Поиск и управление пользователями"
@@ -188,7 +188,8 @@ export const UsersList = () => {
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          py: 2,
+          pt: 4,
+          pb: 2,
           borderBottom: "1px solid",
           borderColor: "divider",
         }}

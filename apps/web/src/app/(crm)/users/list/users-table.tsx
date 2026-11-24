@@ -28,8 +28,33 @@ type UsersTableProps = {
 export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
   return (
     <TableContainer component={Paper}>
-      <Table size="small" sx={{ tableLayout: "fixed", minWidth: "640px" }}>
-        <TableHead>
+      <Table
+        size="small"
+        sx={(theme) => ({
+          tableLayout: "fixed",
+          minWidth: "640px",
+          "& .MuiTableCell-root": {
+            borderBottomColor: `color-mix(in srgb, ${theme.vars.palette.divider} 60%, transparent)`,
+          },
+        })}
+      >
+        <TableHead
+          sx={{
+            "& .MuiTableCell-head": {
+              bgcolor: "transparent",
+              color: "text.secondary",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              lineHeight: 1.5,
+              height: 44,
+              py: 1,
+            },
+            'html[data-density="compact"] & .MuiTableCell-head': {
+              height: 40,
+              py: 0.75,
+            },
+          }}
+        >
           <TableRow>
             <TableCell>Пользователь</TableCell>
             <TableCell width={160}>Роль</TableCell>
