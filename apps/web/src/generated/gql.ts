@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n": typeof types.GetClientsDocument,
     "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": typeof types.FioSuggestionsDocument,
     "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": typeof types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": typeof types.HelloDocument,
@@ -37,6 +38,7 @@ type Documents = {
     "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.UpdateUserDocument,
 };
 const documents: Documents = {
+    "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n": types.GetClientsDocument,
     "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": types.FioSuggestionsDocument,
     "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": types.HelloDocument,
@@ -74,6 +76,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n"): (typeof documents)["\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

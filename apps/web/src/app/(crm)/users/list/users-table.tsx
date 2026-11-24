@@ -23,9 +23,10 @@ import type { UserRow } from "../ui/user-row";
 type UsersTableProps = {
   users: GetUsersQuery["users"];
   onOpen: (user: UserRow) => void;
+  selectedUserId?: string | null;
 };
 
-export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
+export const UsersTable = ({ users, onOpen, selectedUserId }: UsersTableProps) => {
   return (
     <TableContainer component={Paper}>
       <Table
@@ -80,6 +81,7 @@ export const UsersTable = ({ users, onOpen }: UsersTableProps) => {
             const fullName = formatFullName(user).trim() || user.email.trim() || "Без имени";
             return (
               <TableRow
+                selected={user.id === selectedUserId}
                 hover
                 key={user.id}
                 onClick={() => onOpen(user)}

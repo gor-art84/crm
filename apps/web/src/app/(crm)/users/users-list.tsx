@@ -1,14 +1,26 @@
 "use client";
 
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Alert, Box, Button, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Drawer,
+  Paper,
+  Skeleton,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import type { Theme } from "@mui/material/styles";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { UserDetailsContent } from "@/app/(crm)/users/details/user-details-content";
+import { UserFormContent } from "@/app/(crm)/users/form/user-form-content";
 import { RESEND_INVITE } from "@/shared/api/graphql/invites";
 import { ME } from "@/shared/api/graphql/me";
 import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
-import { UserDetailsDrawer } from "./details/user-details-drawer";
-import { UserFormDrawer } from "./form/user-form-drawer";
 import {
   filterUsers,
   parseUsersFilters,
@@ -17,12 +29,29 @@ import {
 } from "./list/filter-users";
 import { UsersFilters } from "./list/users-filters";
 import { UsersTable } from "./list/users-table";
-import type { UserRow } from "./ui/user-row";
 
 const SKELETON_ROWS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
 const URL_UPDATE_DELAY_MS = 300;
 
-type DrawerState = { type: "closed" } | { type: "create" } | { type: "edit"; user: UserRow };
+type PanelState =
+  | { type: "closed" }
+  | { type: "create" }
+  | { type: "view"; userId: string }
+  | { type: "edit"; userId: string };
+
+const panelSurface = (theme: Theme) => ({
+  backgroundColor: theme.vars.palette.background.paper,
+  backgroundImage: `radial-gradient(
+    ellipse at top right,
+    color-mix(in srgb, ${theme.vars.palette.primary.main} 10%, transparent),
+    transparent 65%
+  )`,
+  borderColor: `color-mix(
+    in srgb,
+    ${theme.vars.palette.primary.main} 22%,
+    ${theme.vars.palette.divider}
+  )`,
+});
 
 export const UsersList = () => {
   const { data, loading, error } = useQuery(GET_USERS);
@@ -41,8 +70,10 @@ export const UsersList = () => {
   });
 
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
-  const [drawer, setDrawer] = useState<DrawerState>({ type: "closed" });
-  const [detailsUser, setDetailsUser] = useState<UserRow | null>(null);
+  const [panel, setPanel] = useState<PanelState>({ type: "closed" });
+  const closePanel = () => setPanel({ type: "closed" });
+  const theme = useTheme();
+  const isWideScreen = useMediaQuery(theme.breakpoints.up("lg"));
 
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -175,83 +206,148 @@ export const UsersList = () => {
 
   const mutationError = deactivateError ?? activateError ?? resendError;
 
-  return (
-    <Stack sx={{ gap: 2, mt: -2 }}>
-      <Box
-        component="section"
-        aria-label="Поиск и управление пользователями"
-        sx={{
-          position: "sticky",
-          top: 56,
-          zIndex: 1,
-          bgcolor: "background.paper",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          pt: 4,
-          pb: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
-          <Typography variant="body2" color="text.secondary">
-            {hasActiveFilters
-              ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
-              : `Всего: ${data.users.length}`}
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => setDrawer({ type: "create" })}
-            sx={{ flexShrink: 0 }}
-          >
-            Добавить пользователя
-          </Button>
-        </Stack>
-        <UsersFilters value={filters} onChange={setFilters} />
-      </Box>
-      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
-      {data.users.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: "center" }}>
-          <Typography color="text.secondary">Пока нет пользователей</Typography>
-        </Paper>
-      ) : data.users.length > 0 && filteredUsers.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: "center" }}>
-          <Typography color="text.secondary">
-            Нет пользователей, соответствующих фильтрам
-          </Typography>
-          <Button
-            size="small"
-            variant="text"
-            color="inherit"
-            onClick={() => setFilters({ q: "", role: "", status: "" })}
-          >
-            Сбросить фильтры
-          </Button>
-        </Paper>
-      ) : (
-        <UsersTable users={filteredUsers} onOpen={(user) => setDetailsUser(user)} />
-      )}
-      <UserFormDrawer
-        user={drawer.type === "edit" ? drawer.user : null}
-        open={drawer.type !== "closed"}
-        onClose={() => setDrawer({ type: "closed" })}
-      />
-      <UserDetailsDrawer
-        user={detailsUser}
-        open={detailsUser !== null}
+  const selectedUserId = "userId" in panel ? panel.userId : null;
+  const selectedUser = data.users.find((user) => user.id === selectedUserId);
+
+  let panelContent: ReactNode = null;
+
+  if (panel.type === "view" && selectedUser) {
+    panelContent = (
+      <UserDetailsContent
+        user={selectedUser}
         currentUserId={meData?.me?.id}
-        pending={pendingUserId !== null && pendingUserId === detailsUser?.id}
-        onClose={() => setDetailsUser(null)}
-        onEdit={(user) => {
-          setDetailsUser(null);
-          setDrawer({ type: "edit", user });
-        }}
+        pending={pendingUserId === selectedUser.id}
+        onClose={closePanel}
+        onEdit={(user) => setPanel({ type: "edit", userId: user.id })}
         onResendInvite={handleResendInvite}
         onActivate={handleActivate}
         onDeactivate={handleDeactivate}
       />
-    </Stack>
+    );
+  } else if (panel.type === "edit" && selectedUser) {
+    panelContent = <UserFormContent user={selectedUser} onClose={closePanel} />;
+  } else if (panel.type === "create") {
+    panelContent = <UserFormContent onClose={closePanel} />;
+  }
+
+  const isPanelOpen = panelContent !== null;
+  const showInlinePanel = isWideScreen && isPanelOpen;
+
+  return (
+    <>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: showInlinePanel
+            ? "minmax(0, 1fr) minmax(360px, 40%)"
+            : "minmax(0, 1fr)",
+          alignItems: "start",
+          gap: 2,
+          mt: -2,
+        }}
+      >
+        <Stack sx={{ gap: 2, minWidth: 0 }}>
+          <Box
+            component="section"
+            aria-label="Поиск и управление пользователями"
+            sx={{
+              position: "sticky",
+              top: 56,
+              zIndex: 1,
+              bgcolor: "background.paper",
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              pt: 4,
+              pb: 2,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+              <Typography variant="body2" color="text.secondary">
+                {hasActiveFilters
+                  ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
+                  : `Всего: ${data.users.length}`}
+              </Typography>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => setPanel({ type: "create" })}
+                sx={{ flexShrink: 0 }}
+              >
+                Добавить пользователя
+              </Button>
+            </Stack>
+            <UsersFilters value={filters} onChange={setFilters} />
+          </Box>
+          {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+          {data.users.length === 0 ? (
+            <Paper sx={{ p: 4, textAlign: "center" }}>
+              <Typography color="text.secondary">Пока нет пользователей</Typography>
+            </Paper>
+          ) : data.users.length > 0 && filteredUsers.length === 0 ? (
+            <Paper sx={{ p: 4, textAlign: "center" }}>
+              <Typography color="text.secondary">
+                Нет пользователей, соответствующих фильтрам
+              </Typography>
+              <Button
+                size="small"
+                variant="text"
+                color="inherit"
+                onClick={() => setFilters({ q: "", role: "", status: "" })}
+              >
+                Сбросить фильтры
+              </Button>
+            </Paper>
+          ) : (
+            <UsersTable
+              selectedUserId={selectedUserId}
+              users={filteredUsers}
+              onOpen={(user) => setPanel({ type: "view", userId: user.id })}
+            />
+          )}
+        </Stack>
+        {showInlinePanel && (
+          <Paper
+            variant="outlined"
+            sx={(theme) => ({
+              ...panelSurface(theme),
+              minWidth: 0,
+              position: "sticky",
+              top: 72,
+              height: "calc(100dvh - 124px)",
+              overflowY: panel.type === "view" ? "auto" : "hidden",
+              "@media (prefers-reduced-motion: no-preference)": {
+                "& > [data-user-panel-content]": {
+                  animation: "user-panel-fade-in 160ms ease-out",
+                },
+                "@keyframes user-panel-fade-in": {
+                  from: { opacity: 0.82 },
+                  to: { opacity: 1 },
+                },
+              },
+            })}
+          >
+            {panelContent}
+          </Paper>
+        )}
+      </Box>
+      <Drawer
+        anchor="right"
+        open={!isWideScreen && isPanelOpen}
+        onClose={closePanel}
+        slotProps={{
+          paper: {
+            sx: (theme) => ({
+              ...panelSurface(theme),
+              width: { xs: "100%", sm: 420 },
+            }),
+          },
+        }}
+      >
+        {!isWideScreen && panelContent}
+      </Drawer>
+    </>
   );
 };
