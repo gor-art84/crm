@@ -2,7 +2,6 @@
 
 import { Box, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
-import { LogoutButton } from "@/widgets/app-shell/logout-button";
 import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 
 export const TopBar = () => {
@@ -32,9 +31,6 @@ export const TopBar = () => {
           {title}
         </Typography>
       )}
-      <Box sx={{ display: { xs: "flex", md: "none" }, ml: "auto", flexShrink: 0 }}>
-        <LogoutButton />
-      </Box>
     </Box>
   );
 };
