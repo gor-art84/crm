@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Alert, Button, Paper, Skeleton, Stack, Typography } from "@mui/material";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Alert, Box, Button, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { RESEND_INVITE } from "@/shared/api/graphql/invites";
 import { ME } from "@/shared/api/graphql/me";
 import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
@@ -20,6 +20,7 @@ import { UsersTable } from "./list/users-table";
 import type { UserRow } from "./ui/user-row";
 
 const SKELETON_ROWS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
+const URL_UPDATE_DELAY_MS = 300;
 
 type DrawerState = { type: "closed" } | { type: "create" } | { type: "edit"; user: UserRow };
 
@@ -44,15 +45,83 @@ export const UsersList = () => {
   const [detailsUser, setDetailsUser] = useState<UserRow | null>(null);
 
   const pathName = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
+  const urlQuery = searchParams.toString();
 
-  const filters = parseUsersFilters(searchParams);
+  const [filters, setLocalFilters] = useState<UsersFiltersType>(() =>
+    parseUsersFilters(searchParams),
+  );
+
+  const urlTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastWrittenQueryRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const actualQuery = new URLSearchParams(window.location.search).toString();
+
+    if (urlQuery !== actualQuery) return;
+
+    if (lastWrittenQueryRef.current === urlQuery) {
+      lastWrittenQueryRef.current = null;
+      return;
+    }
+
+    if (urlTimerRef.current !== null) {
+      clearTimeout(urlTimerRef.current);
+      urlTimerRef.current = null;
+    }
+
+    lastWrittenQueryRef.current = null;
+
+    setLocalFilters(parseUsersFilters(new URLSearchParams(urlQuery)));
+  }, [urlQuery]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (urlTimerRef.current !== null) {
+        clearTimeout(urlTimerRef.current);
+        urlTimerRef.current = null;
+      }
+
+      lastWrittenQueryRef.current = null;
+
+      setLocalFilters(parseUsersFilters(new URLSearchParams(window.location.search)));
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+
+      if (urlTimerRef.current !== null) {
+        clearTimeout(urlTimerRef.current);
+        urlTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const setFilters = (next: UsersFiltersType) => {
+    setLocalFilters(next);
+    if (urlTimerRef.current !== null) {
+      clearTimeout(urlTimerRef.current);
+    }
     const params = usersFiltersToSearchParams(next);
     const query = params.toString();
-    router.replace(query ? `${pathName}?${query}` : pathName, { scroll: false });
+    const sourceQuery = new URLSearchParams(window.location.search).toString();
+    urlTimerRef.current = setTimeout(() => {
+      urlTimerRef.current = null;
+
+      const currentQuery = new URLSearchParams(window.location.search).toString();
+
+      if (window.location.pathname !== pathName || currentQuery !== sourceQuery) {
+        return;
+      }
+
+      if (currentQuery === query) return;
+
+      lastWrittenQueryRef.current = query;
+
+      window.history.replaceState(null, "", query ? `${pathName}?${query}` : pathName);
+    }, URL_UPDATE_DELAY_MS);
   };
 
   if (loading && !data)
@@ -107,18 +176,41 @@ export const UsersList = () => {
   const mutationError = deactivateError ?? activateError ?? resendError;
 
   return (
-    <Stack sx={{ gap: 2 }}>
-      <UsersFilters value={filters} onChange={setFilters} />
-      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="body2" color="text.secondary">
-          {hasActiveFilters
-            ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
-            : `Всего: ${data.users.length}`}
-        </Typography>
-        <Button variant="contained" size="small" onClick={() => setDrawer({ type: "create" })}>
-          Добавить пользователя
-        </Button>
-      </Stack>
+    <Stack sx={{ gap: 2, mt: -2 }}>
+      <Box
+        component="section"
+        aria-label="Поиск и управление пользователями"
+        sx={{
+          position: "sticky",
+          top: 56,
+          zIndex: 1,
+          bgcolor: "background.paper",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          pt: 4,
+          pb: 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="body2" color="text.secondary">
+            {hasActiveFilters
+              ? `Найдено: ${filteredUsers.length} из ${data.users.length}`
+              : `Всего: ${data.users.length}`}
+          </Typography>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setDrawer({ type: "create" })}
+            sx={{ flexShrink: 0 }}
+          >
+            Добавить пользователя
+          </Button>
+        </Stack>
+        <UsersFilters value={filters} onChange={setFilters} />
+      </Box>
       {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
       {data.users.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: "center" }}>

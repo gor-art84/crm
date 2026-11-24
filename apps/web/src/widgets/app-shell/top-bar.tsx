@@ -1,8 +1,7 @@
 "use client";
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
-import { LogoutButton } from "@/widgets/app-shell/logout-button";
 import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 
 export const TopBar = () => {
@@ -11,19 +10,20 @@ export const TopBar = () => {
   const title = currentItem?.label ?? (path.startsWith("/profile") ? "Профиль" : undefined);
 
   return (
-    <Paper
-      variant="glass"
+    <Box
       component="header"
       sx={{
         position: "sticky",
-        top: 12,
-        zIndex: (theme) => theme.zIndex.appBar,
+        top: 0,
+        zIndex: 1,
         height: 56,
         flexShrink: 0,
         display: "flex",
         alignItems: "center",
         gap: 2,
-        px: 2.5,
+        px: { xs: 2, md: 3 },
+        bgcolor: "background.paper",
+        borderRadius: "23px 23px 0 0",
       }}
     >
       {title && (
@@ -31,9 +31,6 @@ export const TopBar = () => {
           {title}
         </Typography>
       )}
-      <Box sx={{ display: { xs: "flex", md: "none" }, ml: "auto", flexShrink: 0 }}>
-        <LogoutButton />
-      </Box>
-    </Paper>
+    </Box>
   );
 };

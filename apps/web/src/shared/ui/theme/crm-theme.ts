@@ -15,7 +15,9 @@ export const crmTheme = createTheme({
     light: {
       palette: {
         primary: {
-          main: "#1D5C6B",
+          main: "#247C78",
+          light: "#4F9992",
+          dark: "#1C6663",
           contrastText: "#FFFFFF",
         },
         text: {
@@ -24,7 +26,7 @@ export const crmTheme = createTheme({
           disabled: "#8A909C",
         },
         background: {
-          default: "#F5F6F8",
+          default: "#F6F8FA",
           paper: "#FFFFFF",
         },
         divider: "#E3E6EB",
@@ -61,8 +63,10 @@ export const crmTheme = createTheme({
     dark: {
       palette: {
         primary: {
-          main: "#7CC0CF",
-          contrastText: "#08222A",
+          main: "#7ACBC3",
+          light: "#A4DDD7",
+          dark: "#52ADA5",
+          contrastText: "#0C2927",
         },
         text: {
           primary: "#ECEDF0",
@@ -248,12 +252,12 @@ export const crmTheme = createTheme({
       styleOverrides: (theme) => ({
         body: {
           backgroundImage:
-            "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.22), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.16), transparent 55%)",
+            "radial-gradient(circle at 0% 0%, rgba(139, 164, 228, 0.16), transparent 50%), radial-gradient(circle at 100% 100%, rgba(150, 198, 180, 0.14), transparent 55%)",
           backgroundAttachment: "fixed",
           minHeight: "100vh",
           ...theme.applyStyles("dark", {
             backgroundImage:
-              "radial-gradient(circle at 0% 0%, rgba(99, 115, 145, 0.07), transparent 45%), radial-gradient(circle at 100% 100%, rgba(170, 150, 125, 0.05), transparent 55%)",
+              "radial-gradient(circle at 0% 0%, rgba(139, 164, 228, 0.07), transparent 50%), radial-gradient(circle at 100% 100%, rgba(150, 198, 180, 0.05), transparent 55%)",
           }),
         },
         ":root": {

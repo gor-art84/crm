@@ -1,13 +1,17 @@
 "use client";
 
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Alert, IconButton, Portal, Snackbar, Tooltip } from "@mui/material";
+import { Alert, Button, IconButton, Portal, Snackbar, Tooltip } from "@mui/material";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LOGOUT } from "@/shared/api/graphql/logout";
 
-export const LogoutButton = () => {
+type LogoutButtonProps = {
+  appearance?: "icon" | "text";
+};
+
+export const LogoutButton = ({ appearance = "icon" }: LogoutButtonProps) => {
   const [logout, { loading: logoutLoading }] = useMutation(LOGOUT);
   const router = useRouter();
   const client = useApolloClient();
@@ -26,23 +30,43 @@ export const LogoutButton = () => {
 
   return (
     <>
-      <Tooltip title="Выйти">
-        <span>
-          <IconButton
-            onClick={onLogout}
-            disabled={logoutLoading}
-            aria-label="Выйти"
-            size="small"
-            sx={{
-              color: "text.secondary",
-              minWidth: { xs: 44, md: 28 },
-              minHeight: { xs: 44, md: 28 },
-            }}
-          >
-            <LogOut size={18} strokeWidth={1.75} />
-          </IconButton>
-        </span>
-      </Tooltip>
+      {appearance === "text" ? (
+        <Button
+          type="button"
+          variant="outlined"
+          color="inherit"
+          fullWidth
+          startIcon={<LogOut size={18} strokeWidth={1.75} aria-hidden />}
+          onClick={onLogout}
+          disabled={logoutLoading}
+          aria-busy={logoutLoading}
+          sx={{
+            minHeight: 44,
+            color: "text.secondary",
+          }}
+        >
+          {logoutLoading ? "Выходим…" : "Выйти из аккаунта"}
+        </Button>
+      ) : (
+        <Tooltip title="Выйти">
+          <span>
+            <IconButton
+              onClick={onLogout}
+              disabled={logoutLoading}
+              aria-label="Выйти"
+              size="small"
+              sx={{
+                color: "text.secondary",
+                minWidth: 44,
+                minHeight: 44,
+              }}
+            >
+              <LogOut size={18} strokeWidth={1.75} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      )}
+
       <Portal>
         <Snackbar
           open={logoutFailed}
