@@ -1,6 +1,7 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { X } from "lucide-react";
+import { Archive, ArchiveRestore, X } from "lucide-react";
+import { UserHistorySection } from "@/app/(crm)/users/details/user-history-section";
 import { formatFullName } from "@/shared/lib/person-name";
 import { formatRuPhoneMask } from "@/shared/lib/phone-ru";
 import { ROLE_LABELS } from "@/shared/model/roles";
@@ -18,6 +19,8 @@ type UserDetailsContentProps = {
   onResendInvite: (userId: string) => void;
   onActivate: (userId: string) => void;
   onDeactivate: (userId: string) => void;
+  onArchive: (user: UserRow) => void;
+  onRestore: (user: UserRow) => void;
 };
 
 export const UserDetailsContent = ({
@@ -29,17 +32,61 @@ export const UserDetailsContent = ({
   onResendInvite,
   onActivate,
   onDeactivate,
+  onArchive,
+  onRestore,
 }: UserDetailsContentProps) => {
   const isCurrentUser = user.id === currentUserId;
+  const canChangeAccess = !isCurrentUser && user.archivedAt === null;
+  const canArchive = Boolean(currentUserId) && canChangeAccess;
+  const canRestore = Boolean(currentUserId) && !isCurrentUser && user.archivedAt !== null;
   return (
     <Stack sx={{ height: "100%", p: 3, gap: 2 }} data-user-panel-content>
       <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 1 }}>
         <Typography variant="h4" component="h2">
           Пользователь
         </Typography>
-        <IconButton aria-label="Закрыть" onClick={onClose} size="small">
-          <X size={18} strokeWidth={1.75} />
-        </IconButton>
+        <Stack direction="row" sx={{ alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+          {canRestore && (
+            <Tooltip title="Восстановить из архива">
+              <span style={{ display: "inline-flex" }}>
+                <IconButton
+                  aria-label="Восстановить из архива"
+                  disabled={pending}
+                  onClick={() => onRestore(user)}
+                  sx={{
+                    color: "text.secondary",
+                    width: { xs: 44, sm: 36 },
+                    height: { xs: 44, sm: 36 },
+                  }}
+                >
+                  <ArchiveRestore size={18} strokeWidth={1.75} />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+          {canArchive && (
+            <Tooltip title="В архив">
+              <span style={{ display: "inline-flex" }}>
+                <IconButton
+                  aria-label="В архив"
+                  disabled={pending}
+                  onClick={() => onArchive(user)}
+                  sx={{
+                    color: "text.secondary",
+                    width: { xs: 44, sm: 36 },
+                    height: { xs: 44, sm: 36 },
+                  }}
+                >
+                  <Archive size={18} strokeWidth={1.75} />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+
+          <IconButton aria-label="Закрыть" onClick={onClose} size="small">
+            <X size={18} strokeWidth={1.75} />
+          </IconButton>
+        </Stack>
       </Stack>
 
       <Stack direction="row" sx={{ gap: 1.5, alignItems: "center" }}>
@@ -92,6 +139,7 @@ export const UserDetailsContent = ({
           value={user.birthDate && dayjs(user.birthDate).format("D MMMM YYYY")}
         />
       </Stack>
+      <UserHistorySection userId={user.id} />
 
       <Stack sx={{ gap: 1, mt: "auto", borderTop: "1px solid", borderColor: "divider", pt: 1.5 }}>
         {isCurrentUser && (
@@ -100,40 +148,49 @@ export const UserDetailsContent = ({
           </Typography>
         )}
 
-        <Box
+        <Stack
+          direction={{ xs: "column", lg: "row" }}
           sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: isCurrentUser ? "minmax(0, 1fr)" : "repeat(2, minmax(0, 1fr))",
-              sm: isCurrentUser ? "auto" : "auto auto",
-            },
-            width: { xs: "100%", sm: "auto" },
             gap: 1,
-            ml: "auto",
-            "& > .MuiButton-root": {
-              minHeight: { xs: 44, sm: 40 },
-            },
+            alignItems: { xs: "stretch", lg: "center" },
+            flexWrap: { lg: "wrap" },
           }}
         >
-          {!isCurrentUser && (
-            <Button
-              variant="text"
-              color="inherit"
-              fullWidth
-              disabled={pending}
-              onClick={() => (user.isActive ? onDeactivate(user.id) : onActivate(user.id))}
-              sx={{
-                bgcolor: "action.hover",
-                "&:hover": { bgcolor: "action.selected" },
-              }}
-            >
-              {user.isActive ? "Отключить" : "Включить"}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: canChangeAccess ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)",
+                sm: canChangeAccess ? "auto auto" : "auto",
+              },
+              width: { xs: "100%", sm: "auto" },
+              gap: 1,
+              ml: "auto",
+              "& > .MuiButton-root": {
+                minHeight: { xs: 44, sm: 40 },
+              },
+            }}
+          >
+            {!isCurrentUser && canChangeAccess && (
+              <Button
+                variant="text"
+                color="inherit"
+                fullWidth
+                disabled={pending}
+                onClick={() => (user.isActive ? onDeactivate(user.id) : onActivate(user.id))}
+                sx={{
+                  bgcolor: "action.hover",
+                  "&:hover": { bgcolor: "action.selected" },
+                }}
+              >
+                {user.isActive ? "Отключить" : "Включить"}
+              </Button>
+            )}
+            <Button variant="contained" fullWidth onClick={() => onEdit(user)}>
+              Изменить
             </Button>
-          )}
-          <Button variant="contained" fullWidth onClick={() => onEdit(user)}>
-            Изменить
-          </Button>
-        </Box>
+          </Box>
+        </Stack>
       </Stack>
     </Stack>
   );

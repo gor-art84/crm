@@ -12,7 +12,7 @@ import {
 import { ROLE_PERMISSIONS } from "../auth/role-permissions.js";
 import { SessionsService } from "../auth/sessions.service.js";
 import { emptyToNull } from "../common/empty-to-null.js";
-import { Prisma, Role } from "../generated/prisma/client.js";
+import { Prisma, Role, UserHistoryEventType } from "../generated/prisma/client.js";
 import { ImageProcessingService } from "../images/image-processing.service.js";
 import { InvitesService } from "../invites/invites.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
@@ -22,6 +22,7 @@ import { UpdateMyProfileInput } from "./dto/update-my-profile.input.js";
 import { UpdateMyUiSettingsInput } from "./dto/update-my-ui-settings.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
+import { UserHistoryEventObject } from "./dto/user-history-event.object.js";
 import { filterPermissionsBeyondRole } from "./user-permissions.js";
 
 const userSelect = {
@@ -41,6 +42,7 @@ const userSelect = {
   density: true,
   role: true,
   isActive: true,
+  archivedAt: true,
 } satisfies Prisma.UserSelect;
 
 const userObjectSelect = {
@@ -158,6 +160,42 @@ export class UsersService {
     return users.map((user) => this.toUserObject(user));
   }
 
+  async findHistory(userId: string): Promise<UserHistoryEventObject[]> {
+    await this.requireUser(userId);
+    const events = await this.prisma.userHistoryEvent.findMany({
+      where: { subjectUserId: userId },
+      orderBy: {
+        createdAt: "desc",
+      },
+
+      select: {
+        id: true,
+        createdAt: true,
+        type: true,
+        actorUserId: true,
+        actor: {
+          select: {
+            lastName: true,
+            firstName: true,
+            middleName: true,
+          },
+        },
+      },
+    });
+
+    return events.map(({ actor, ...event }) => {
+      const actorName = [actor.lastName, actor.firstName, actor.middleName]
+        .map((part) => part?.trim())
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        ...event,
+        actorName: actorName || "Без имени",
+      };
+    });
+  }
+
   async create(createUserInput: CreateUserInput): Promise<UserObject> {
     const extraPermissions = new Set(createUserInput.extraPermissions ?? []);
     const permissionsBeyondRole = filterPermissionsBeyondRole(
@@ -220,9 +258,26 @@ export class UsersService {
 
     const updatedUser = await this.prisma.$transaction(async (tx) => {
       await this.invitesService.revokeOpenInvites(tx, userId);
-      return tx.user.update({
+      const { count } = await tx.user.updateMany({
+        where: {
+          id: userId,
+          isActive: true,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+      if (count === 1) {
+        await tx.userHistoryEvent.create({
+          data: {
+            subjectUserId: userId,
+            actorUserId,
+            type: UserHistoryEventType.DEACTIVATED,
+          },
+        });
+      }
+      return tx.user.findUniqueOrThrow({
         where: { id: userId },
-        data: { isActive: false },
         select: userObjectSelect,
       });
     });
@@ -231,12 +286,38 @@ export class UsersService {
     return this.toUserObject(updatedUser);
   }
 
-  async activate(userId: string): Promise<UserObject> {
+  async activate(userId: string, actorUserId: string): Promise<UserObject> {
     await this.requireUser(userId);
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: { isActive: true },
-      select: userObjectSelect,
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.user.updateMany({
+        where: {
+          id: userId,
+          isActive: false,
+          archivedAt: null,
+        },
+        data: {
+          isActive: true,
+        },
+      });
+      if (count === 1) {
+        await tx.userHistoryEvent.create({
+          data: {
+            subjectUserId: userId,
+            actorUserId,
+            type: UserHistoryEventType.ACTIVATED,
+          },
+        });
+      }
+      const updated = await tx.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { ...userObjectSelect, archivedAt: true },
+      });
+
+      if (updated.archivedAt !== null) {
+        throw new ForbiddenException("Сначала восстановите пользователя из архива");
+      }
+
+      return updated;
     });
     return this.toUserObject(updatedUser);
   }
@@ -376,6 +457,74 @@ export class UsersService {
         err instanceof Error ? err.stack : String(err),
       );
     }
+    return this.toUserObject(updatedUser);
+  }
+
+  async archive(userId: string, actorUserId: string): Promise<UserObject> {
+    const existingUser = await this.requireUser(userId);
+    if (actorUserId === existingUser.id)
+      throw new ForbiddenException("Нельзя архивировать самого себя");
+    await this.assertCanDemoteAdmin(existingUser);
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      await this.invitesService.revokeOpenInvites(tx, userId);
+      const { count } = await tx.user.updateMany({
+        where: {
+          id: userId,
+          archivedAt: null,
+        },
+        data: {
+          archivedAt: new Date(),
+          isActive: false,
+        },
+      });
+      if (count === 1) {
+        await tx.userHistoryEvent.create({
+          data: {
+            subjectUserId: userId,
+            actorUserId,
+            type: UserHistoryEventType.ARCHIVED,
+          },
+        });
+      }
+      return tx.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: userObjectSelect,
+      });
+    });
+
+    await this.sessionsService.revokeAllSessions(userId);
+    return this.toUserObject(updatedUser);
+  }
+
+  async restore(userId: string, actorUserId: string): Promise<UserObject> {
+    await this.requireUser(userId);
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.user.updateMany({
+        where: {
+          id: userId,
+          archivedAt: { not: null },
+        },
+        data: {
+          archivedAt: null,
+          isActive: false,
+        },
+      });
+
+      if (count === 1) {
+        await tx.userHistoryEvent.create({
+          data: {
+            subjectUserId: userId,
+            actorUserId,
+            type: UserHistoryEventType.RESTORED,
+          },
+        });
+      }
+
+      return tx.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: userObjectSelect,
+      });
+    });
     return this.toUserObject(updatedUser);
   }
 }

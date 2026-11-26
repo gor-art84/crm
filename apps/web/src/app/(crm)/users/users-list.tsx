@@ -18,9 +18,19 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { UserDetailsContent } from "@/app/(crm)/users/details/user-details-content";
 import { UserFormContent } from "@/app/(crm)/users/form/user-form-content";
+import type { UserRow } from "@/app/(crm)/users/ui/user-row";
 import { RESEND_INVITE } from "@/shared/api/graphql/invites";
 import { ME } from "@/shared/api/graphql/me";
-import { ACTIVATE_USER, DEACTIVATE_USER, GET_USERS } from "@/shared/api/graphql/users";
+import {
+  ACTIVATE_USER,
+  ARCHIVE_USER,
+  DEACTIVATE_USER,
+  GET_USER_HISTORY,
+  GET_USERS,
+  RESTORE_USER,
+} from "@/shared/api/graphql/users";
+import { formatFullName } from "@/shared/lib/person-name";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import {
   filterUsers,
   parseUsersFilters,
@@ -32,6 +42,8 @@ import { UsersTable } from "./list/users-table";
 
 const SKELETON_ROWS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
 const URL_UPDATE_DELAY_MS = 300;
+
+type UserAction = { kind: "archive" | "restore"; user: UserRow };
 
 type PanelState =
   | { type: "closed" }
@@ -57,17 +69,22 @@ export const UsersList = () => {
   const { data, loading, error } = useQuery(GET_USERS);
   const { data: meData } = useQuery(ME);
 
-  const [deactivateUser, { error: deactivateError }] = useMutation(DEACTIVATE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
-  });
+  const [deactivateUser, { error: deactivateError }] = useMutation(DEACTIVATE_USER);
 
-  const [activateUser, { error: activateError }] = useMutation(ACTIVATE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
-  });
+  const [activateUser, { error: activateError }] = useMutation(ACTIVATE_USER);
 
   const [resendInvite, { error: resendError }] = useMutation(RESEND_INVITE, {
     refetchQueries: [{ query: GET_USERS }],
   });
+
+  const [userAction, setUserAction] = useState<UserAction | null>(null);
+  const [actionOpen, setActionOpen] = useState(false);
+
+  const [archiveUser, { loading: archiveLoading, error: archiveError, reset: resetArchive }] =
+    useMutation(ARCHIVE_USER);
+
+  const [restoreUser, { loading: restoreLoading, error: restoreError, reset: resetRestore }] =
+    useMutation(RESTORE_USER);
 
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [panel, setPanel] = useState<PanelState>({ type: "closed" });
@@ -174,7 +191,10 @@ export const UsersList = () => {
   const handleDeactivate = async (userId: string) => {
     setPendingUserId(userId);
     try {
-      await deactivateUser({ variables: { userId } });
+      await deactivateUser({
+        variables: { userId },
+        refetchQueries: [{ query: GET_USERS }, { query: GET_USER_HISTORY, variables: { userId } }],
+      });
     } catch {
       // Ошибка отображается через состояние мутации
     } finally {
@@ -185,7 +205,10 @@ export const UsersList = () => {
   const handleActivate = async (userId: string) => {
     setPendingUserId(userId);
     try {
-      await activateUser({ variables: { userId } });
+      await activateUser({
+        variables: { userId },
+        refetchQueries: [{ query: GET_USERS }, { query: GET_USER_HISTORY, variables: { userId } }],
+      });
     } catch {
       // Ошибка отображается через состояние мутации
     } finally {
@@ -204,6 +227,38 @@ export const UsersList = () => {
     }
   };
 
+  const isRestore = userAction?.kind === "restore";
+  const actionLoading = isRestore ? restoreLoading : archiveLoading;
+  const actionError = isRestore ? restoreError : archiveError;
+
+  const handleOpenUserAction = (kind: UserAction["kind"], user: UserRow) => {
+    setUserAction({ kind, user });
+    if (kind === "restore") {
+      resetRestore();
+    } else {
+      resetArchive();
+    }
+    setActionOpen(true);
+  };
+
+  const handleConfirmUserAction = async () => {
+    if (!userAction || actionLoading) return;
+
+    const userId = userAction.user.id;
+    const options = {
+      variables: { userId },
+      refetchQueries: [{ query: GET_USERS }, { query: GET_USER_HISTORY, variables: { userId } }],
+    };
+
+    try {
+      userAction.kind === "restore" ? await restoreUser(options) : await archiveUser(options);
+      setActionOpen(false);
+      closePanel();
+    } catch {
+      // Ошибка уже доступна через archiveError. Оставь диалог открытым.
+    }
+  };
+
   const mutationError = deactivateError ?? activateError ?? resendError;
 
   const selectedUserId = "userId" in panel ? panel.userId : null;
@@ -214,6 +269,8 @@ export const UsersList = () => {
   if (panel.type === "view" && selectedUser) {
     panelContent = (
       <UserDetailsContent
+        onArchive={() => handleOpenUserAction("archive", selectedUser)}
+        onRestore={() => handleOpenUserAction("restore", selectedUser)}
         user={selectedUser}
         currentUserId={meData?.me?.id}
         pending={pendingUserId === selectedUser.id}
@@ -348,6 +405,23 @@ export const UsersList = () => {
       >
         {!isWideScreen && panelContent}
       </Drawer>
+      <ConfirmDialog
+        open={actionOpen}
+        loading={actionLoading}
+        error={actionError?.message || null}
+        title={isRestore ? "Восстановить сотрудника?" : "Отправить сотрудника в архив?"}
+        confirmLabel={isRestore ? "Восстановить" : "В архив"}
+        confirmColor={isRestore ? "primary" : "error"}
+        description={
+          isRestore
+            ? `${formatFullName(userAction.user)} вернётся в основной список. Доступ останется выключенным.`
+            : userAction?.user
+              ? `${formatFullName(userAction?.user)} потеряет доступ. Карточка и история останутся в архиве.`
+              : ""
+        }
+        onClose={() => setActionOpen(false)}
+        onConfirm={handleConfirmUserAction}
+      />
     </>
   );
 };

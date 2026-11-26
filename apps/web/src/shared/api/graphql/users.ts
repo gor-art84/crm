@@ -17,6 +17,7 @@ export const GET_USERS = gql(`
       whatsapp
       maxAccount
       isActive
+        archivedAt
       inviteStatus
     }
   }
@@ -107,5 +108,39 @@ export const UPDATE_USER = gql(`
       isActive
       inviteStatus
     }
+  }
+`);
+
+export const GET_USER_HISTORY = gql(`
+  query GetUserHistory($userId: String!) {
+      userHistory(userId: $userId) {
+          id
+          type
+          createdAt
+          actorUserId
+          actorName
+      }
+  }
+`);
+
+export const ARCHIVE_USER = gql(`
+  mutation ArchiveUser($userId: String!) {
+      archiveUser(userId: $userId) {
+          id
+          isActive
+          archivedAt
+          __typename
+      }
+  }
+`);
+
+export const RESTORE_USER = gql(`
+  mutation RestoreUser($userId: String!) {
+      restoreUser(userId: $userId) {
+          id
+          isActive
+          archivedAt
+          __typename
+      }
   }
 `);

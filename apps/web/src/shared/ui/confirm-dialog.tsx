@@ -14,6 +14,7 @@ type ConfirmDialogProps = {
   title: string;
   description: ReactNode;
   confirmLabel: string;
+  confirmColor?: "primary" | "error";
   loading?: boolean;
   error?: string | null;
   onConfirm: () => void;
@@ -25,6 +26,7 @@ export const ConfirmDialog = ({
   title,
   description,
   confirmLabel,
+  confirmColor = "error",
   loading = false,
   error,
   onConfirm,
@@ -49,7 +51,7 @@ export const ConfirmDialog = ({
         <Button onClick={handleClose} disabled={loading}>
           Отмена
         </Button>
-        <Button onClick={onConfirm} loading={loading} variant="contained" color="error">
+        <Button onClick={onConfirm} loading={loading} variant="contained" color={confirmColor}>
           {confirmLabel}
         </Button>
       </DialogActions>

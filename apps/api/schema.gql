@@ -138,6 +138,7 @@ input LoginInput {
 type Mutation {
   acceptInvite(input: AcceptInviteInput!): Boolean!
   activateUser(userId: String!): UserObject!
+  archiveUser(userId: String!): UserObject!
   changePassword(input: ChangePasswordInput!): Boolean!
   createClient(createClientInput: CreateClientInput!): ClientObject!
   createUser(createUserInput: CreateUserInput!): UserObject!
@@ -146,6 +147,7 @@ type Mutation {
   login(input: LoginInput!): AuthPayload!
   logout: Boolean!
   resendInvite(userId: String!): Boolean!
+  restoreUser(userId: String!): UserObject!
   revokeOtherSessions: Int!
   revokeSession(id: ID!): Boolean!
   updateMyProfile(input: UpdateMyProfileInput!): UserObject!
@@ -201,6 +203,7 @@ type Query {
   me: UserObject!
   mySessions: [SessionObject!]!
   partyByInn(inn: String!): [PartyObject!]!
+  userHistory(userId: String!): [UserHistoryEventObject!]!
   users: [UserObject!]!
 }
 
@@ -261,7 +264,23 @@ input UpdateUserInput {
   whatsapp: String
 }
 
+type UserHistoryEventObject {
+  actorName: String!
+  actorUserId: String!
+  createdAt: DateTime!
+  id: String!
+  type: UserHistoryEventType!
+}
+
+enum UserHistoryEventType {
+  ACTIVATED
+  ARCHIVED
+  DEACTIVATED
+  RESTORED
+}
+
 type UserObject {
+  archivedAt: DateTime
   avatarUrl: String
   birthDate: DateTime
   createdAt: DateTime

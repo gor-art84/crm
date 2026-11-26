@@ -5,7 +5,7 @@ import { ROLE_LABELS } from "@/shared/model/roles";
 export type UsersFiltersType = {
   q: string;
   role: Role | "";
-  status: "" | "active" | "inactive";
+  status: "" | "active" | "inactive" | "archived";
 };
 
 export const parseUsersFilters = (params: URLSearchParams): UsersFiltersType => {
@@ -13,7 +13,10 @@ export const parseUsersFilters = (params: URLSearchParams): UsersFiltersType => 
   const roleParam = params.get("role");
   const role = roleParam && roleParam in ROLE_LABELS ? (roleParam as Role) : "";
   const statusParam = params.get("status");
-  const status = statusParam === "active" || statusParam === "inactive" ? statusParam : "";
+  const status =
+    statusParam === "active" || statusParam === "inactive" || statusParam === "archived"
+      ? statusParam
+      : "";
   return { q, role, status };
 };
 
@@ -33,6 +36,7 @@ export const filterUsers = (
   const needle = filters.q.trim().toLowerCase();
 
   return users.filter((user) => {
+    const isArchived = user.archivedAt !== null;
     if (needle) {
       const name = formatFullName(user).toLowerCase();
       const email = user.email.toLowerCase();
@@ -51,7 +55,10 @@ export const filterUsers = (
     if (filters.status === "inactive" && user.isActive) {
       return false;
     }
+    if (filters.status === "archived") {
+      return isArchived;
+    }
 
-    return true;
+    return !isArchived;
   });
 };

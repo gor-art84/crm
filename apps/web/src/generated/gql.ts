@@ -14,7 +14,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n": typeof types.GetClientsDocument,
     "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": typeof types.FioSuggestionsDocument,
     "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": typeof types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": typeof types.HelloDocument,
@@ -31,14 +30,16 @@ type Documents = {
     "\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n": typeof types.RevokeOtherSessionsDocument,
     "\n  query MySessions {\n      mySessions {\n      id\n      isCurrent\n      issuedAt\n      browser\n      os\n      deviceType\n      }\n  }\n": typeof types.MySessionsDocument,
     "\n  mutation RevokeSession($id: ID!) {\n      revokeSession(id: $id)\n  }\n": typeof types.RevokeSessionDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.GetUsersDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.DeactivateUserDocument,
     "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.ActivateUserDocument,
     "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": typeof types.UpdateUserDocument,
+    "\n  query GetUserHistory($userId: String!) {\n      userHistory(userId: $userId) {\n          id\n          type\n          createdAt\n          actorUserId\n          actorName\n      }\n  }\n": typeof types.GetUserHistoryDocument,
+    "\n  mutation ArchiveUser($userId: String!) {\n      archiveUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n": typeof types.ArchiveUserDocument,
+    "\n  mutation RestoreUser($userId: String!) {\n      restoreUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n": typeof types.RestoreUserDocument,
 };
 const documents: Documents = {
-    "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n": types.GetClientsDocument,
     "\n  query FioSuggestions($query: String!, $count: Int) {\n    fioSuggestions(query: $query, count: $count) {\n      value\n      name\n      surname\n      patronymic\n    }\n  }\n  ": types.FioSuggestionsDocument,
     "\n  query CleanFio($query: String!) {\n    cleanFio(query: $query) {\n      result\n      surname\n      name\n      patronymic\n      gender\n      qc\n    }\n  }\n": types.CleanFioDocument,
     "\n    query Hello {\n        hello\n    }\n": types.HelloDocument,
@@ -55,11 +56,14 @@ const documents: Documents = {
     "\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n": types.RevokeOtherSessionsDocument,
     "\n  query MySessions {\n      mySessions {\n      id\n      isCurrent\n      issuedAt\n      browser\n      os\n      deviceType\n      }\n  }\n": types.MySessionsDocument,
     "\n  mutation RevokeSession($id: ID!) {\n      revokeSession(id: $id)\n  }\n": types.RevokeSessionDocument,
-    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.GetUsersDocument,
+    "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateUser($createUserInput: CreateUserInput!) {\n    createUser(createUserInput: $createUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.CreateUserDocument,
     "\n  mutation DeactivateUser($userId: String!) {\n    deactivateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.DeactivateUserDocument,
     "\n  mutation ActivateUser($userId: String!) {\n    activateUser(userId: $userId) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.ActivateUserDocument,
     "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n": types.UpdateUserDocument,
+    "\n  query GetUserHistory($userId: String!) {\n      userHistory(userId: $userId) {\n          id\n          type\n          createdAt\n          actorUserId\n          actorName\n      }\n  }\n": types.GetUserHistoryDocument,
+    "\n  mutation ArchiveUser($userId: String!) {\n      archiveUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n": types.ArchiveUserDocument,
+    "\n  mutation RestoreUser($userId: String!) {\n      restoreUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n": types.RestoreUserDocument,
 };
 
 /**
@@ -76,10 +80,6 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n"): (typeof documents)["\n  query GetClients {\n    clients {\n        id\n        type\n        fullName\n        shortName\n        inn\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -147,7 +147,7 @@ export function gql(source: "\n  mutation RevokeSession($id: ID!) {\n      revok
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n"];
+export function gql(source: "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n"): (typeof documents)["\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -164,6 +164,18 @@ export function gql(source: "\n  mutation ActivateUser($userId: String!) {\n    
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateUser($userId: String!, $updateUserInput: UpdateUserInput!) {\n    updateUser(userId: $userId, updateUserInput: $updateUserInput) {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n      inviteStatus\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUserHistory($userId: String!) {\n      userHistory(userId: $userId) {\n          id\n          type\n          createdAt\n          actorUserId\n          actorName\n      }\n  }\n"): (typeof documents)["\n  query GetUserHistory($userId: String!) {\n      userHistory(userId: $userId) {\n          id\n          type\n          createdAt\n          actorUserId\n          actorName\n      }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ArchiveUser($userId: String!) {\n      archiveUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n"): (typeof documents)["\n  mutation ArchiveUser($userId: String!) {\n      archiveUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RestoreUser($userId: String!) {\n      restoreUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n"): (typeof documents)["\n  mutation RestoreUser($userId: String!) {\n      restoreUser(userId: $userId) {\n          id\n          isActive\n          archivedAt\n          __typename\n      }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
