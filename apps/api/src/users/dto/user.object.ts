@@ -23,6 +23,9 @@ export class UserObject {
   @Field(() => Boolean)
   isActive: boolean;
 
+  @Field(() => Date, { nullable: true })
+  archivedAt?: Date | null;
+
   @Field(() => String, { nullable: true })
   middleName: string | null;
 

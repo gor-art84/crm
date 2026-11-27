@@ -50,3 +50,13 @@ export const REVOKE_OTHER_SESSIONS = gql(`
     revokeOtherSessions
   }
 `);
+
+export const MY_USER_HISTORY = gql(`
+  query MyUserHistory {
+    myUserHistory {
+      id
+      createdAt
+      type
+    }
+  }
+`);

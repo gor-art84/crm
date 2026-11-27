@@ -4,7 +4,12 @@ import type { StatusTone } from "@/shared/ui/status-chip";
 export const getUserStatus = (user: {
   isActive: boolean;
   inviteStatus: InviteStatus;
+  archivedAt: string | null;
 }): { label: string; tone: StatusTone } => {
+  if (user.archivedAt) {
+    return { label: "В архиве", tone: "neutral" };
+  }
+
   if (!user.isActive) {
     return { label: "Отключён", tone: "neutral" };
   }

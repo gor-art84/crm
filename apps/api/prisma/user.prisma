@@ -15,6 +15,13 @@ enum Permission {
   CLIENTS_WRITE
 }
 
+enum UserHistoryEventType {
+  ACTIVATED
+  DEACTIVATED
+  ARCHIVED
+  RESTORED
+}
+
 enum UiThemeMode {
   LIGHT
   DARK
@@ -27,27 +34,30 @@ enum UiDensity {
 }
 
 model User {
-  id           String           @id @default(uuid())
-  email        String           @unique
-  passwordHash String?
-  lastName     String           @default("User")
-  firstName    String           @default("Admin")
-  permissions  UserPermission[]
-  middleName   String?
-  birthDate    DateTime?
-  phone        String?
-  telegram     String?
-  whatsapp     String?
-  maxAccount   String?
-  jobTitle     String?
-  role         Role             @default(MANAGER)
-  isActive     Boolean          @default(true)
-  avatarKey    String?
-  themeMode    UiThemeMode?
-  density      UiDensity?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  userInvites  UserInvite[]
+  id                    String             @id @default(uuid())
+  email                 String             @unique
+  passwordHash          String?
+  lastName              String             @default("User")
+  firstName             String             @default("Admin")
+  permissions           UserPermission[]
+  middleName            String?
+  birthDate             DateTime?
+  phone                 String?
+  telegram              String?
+  whatsapp              String?
+  maxAccount            String?
+  jobTitle              String?
+  role                  Role               @default(MANAGER)
+  isActive              Boolean            @default(true)
+  archivedAt            DateTime?
+  avatarKey             String?
+  themeMode             UiThemeMode?
+  density               UiDensity?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  userInvites           UserInvite[]
+  historyEvents         UserHistoryEvent[] @relation("UserHistorySubject")
+  authoredHistoryEvents UserHistoryEvent[] @relation("UserHistoryActor")
 }
 
 model UserPermission {
@@ -70,4 +80,17 @@ model UserInvite {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model UserHistoryEvent {
+  id            String               @id @default(uuid())
+  subjectUserId String
+  actorUserId   String
+  type          UserHistoryEventType
+  createdAt     DateTime             @default(now())
+
+  subject User @relation("UserHistorySubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  actor   User @relation("UserHistoryActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([subjectUserId, createdAt])
 }

@@ -8,6 +8,7 @@ import { Permission } from "../generated/prisma/enums.js";
 import { CreateUserInput } from "./dto/create-user.input.js";
 import { UpdateUserInput } from "./dto/update-user.input.js";
 import { UserObject } from "./dto/user.object.js";
+import { UserHistoryEventObject } from "./dto/user-history-event.object.js";
 import { UsersService } from "./users.service.js";
 
 @Resolver(() => UserObject)
@@ -19,6 +20,13 @@ export class UsersResolver {
   @Permissions(Permission.USERS_READ)
   async users() {
     return this.usersService.findMany();
+  }
+
+  @Query(() => [UserHistoryEventObject])
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
+  @Permissions(Permission.USERS_READ)
+  async userHistory(@Args("userId", { type: () => String }) userId: string) {
+    return this.usersService.findHistory(userId);
   }
 
   @Mutation(() => UserObject)
@@ -42,8 +50,12 @@ export class UsersResolver {
   @Mutation(() => UserObject)
   @UseGuards(SessionAuthGuard, PermissionsGuard)
   @Permissions(Permission.USERS_WRITE)
-  async activateUser(@Args("userId") userId: string) {
-    return this.usersService.activate(userId);
+  async activateUser(@Args("userId") userId: string, @Context() context: GqlContext) {
+    const actorUserId = context.req.session?.userId;
+    if (!actorUserId) {
+      throw new UnauthorizedException("Actor user ID is not available");
+    }
+    return this.usersService.activate(userId, actorUserId);
   }
 
   @Mutation(() => UserObject)
@@ -59,5 +71,27 @@ export class UsersResolver {
   @ResolveField(() => String, { nullable: true })
   avatarUrl(@Parent() user: { avatarKey: string | null }): string | null {
     return this.usersService.getAvatarUrl(user.avatarKey);
+  }
+
+  @Mutation(() => UserObject)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
+  @Permissions(Permission.USERS_WRITE)
+  async archiveUser(@Args("userId") userId: string, @Context() context: GqlContext) {
+    const actorUserId = context.req.session?.userId;
+    if (!actorUserId) {
+      throw new UnauthorizedException("Actor user ID is not available");
+    }
+    return this.usersService.archive(userId, actorUserId);
+  }
+
+  @Mutation(() => UserObject)
+  @UseGuards(SessionAuthGuard, PermissionsGuard)
+  @Permissions(Permission.USERS_WRITE)
+  async restoreUser(@Args("userId") userId: string, @Context() context: GqlContext) {
+    const actorUserId = context.req.session?.userId;
+    if (!actorUserId) {
+      throw new UnauthorizedException("Actor user ID is not available");
+    }
+    return this.usersService.restore(userId, actorUserId);
   }
 }

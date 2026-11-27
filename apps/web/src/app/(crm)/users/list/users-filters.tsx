@@ -78,6 +78,7 @@ export const UsersFilters = ({ value, onChange }: UsersFiltersProps) => {
         <MenuItem value="">Все</MenuItem>
         <MenuItem value="active">Активен</MenuItem>
         <MenuItem value="inactive">Отключён</MenuItem>
+        <MenuItem value="archived">Архив</MenuItem>
       </TextField>
       {hasActiveFilters && (
         <Button

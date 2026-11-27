@@ -3,13 +3,14 @@ import { AuthModule } from "../auth/auth.module.js";
 import { InvitesModule } from "../invites/invites.module.js";
 import { MeController } from "./me.controller.js";
 import { ProfileResolver } from "./profile.resolver.js";
+import { UserHistoryService } from "./user-history.service.js";
 import { UsersController } from "./users.controller.js";
 import { UsersResolver } from "./users.resolver.js";
 import { UsersService } from "./users.service.js";
 
 @Module({
   imports: [AuthModule, InvitesModule],
-  providers: [UsersResolver, UsersService, ProfileResolver],
+  providers: [UsersResolver, UsersService, ProfileResolver, UserHistoryService],
   controllers: [UsersController, MeController],
 })
 export class UsersModule {}
