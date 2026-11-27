@@ -155,6 +155,12 @@ type Mutation {
   updateUser(updateUserInput: UpdateUserInput!, userId: String!): UserObject!
 }
 
+type MyUserHistoryEventObject {
+  createdAt: DateTime!
+  id: String!
+  type: UserHistoryEventType!
+}
+
 type PartyObject {
   directorName: String
   directorPosition: String
@@ -202,6 +208,7 @@ type Query {
   lookup(inn: String!): ClientLookupObject!
   me: UserObject!
   mySessions: [SessionObject!]!
+  myUserHistory: [MyUserHistoryEventObject!]!
   partyByInn(inn: String!): [PartyObject!]!
   userHistory(userId: String!): [UserHistoryEventObject!]!
   users: [UserObject!]!

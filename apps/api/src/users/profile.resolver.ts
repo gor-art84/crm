@@ -5,11 +5,16 @@ import { SessionAuthGuard } from "../auth/guards/session-auth.guard.js";
 import { UpdateMyProfileInput } from "./dto/update-my-profile.input.js";
 import { UpdateMyUiSettingsInput } from "./dto/update-my-ui-settings.input.js";
 import { UserObject } from "./dto/user.object.js";
+import { MyUserHistoryEventObject } from "./dto/user-history-event.object.js";
+import { UserHistoryService } from "./user-history.service.js";
 import { UsersService } from "./users.service.js";
 
 @Resolver()
 export class ProfileResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userHistoryService: UserHistoryService,
+  ) {}
 
   @Query(() => UserObject)
   @UseGuards(SessionAuthGuard)
@@ -39,5 +44,11 @@ export class ProfileResolver {
   @UseGuards(SessionAuthGuard)
   async deleteMyAvatar(@CurrentUserId() userId: string) {
     return this.usersService.deleteMyAvatar(userId);
+  }
+
+  @Query(() => [MyUserHistoryEventObject])
+  @UseGuards(SessionAuthGuard)
+  async myUserHistory(@CurrentUserId() userId: string) {
+    return this.userHistoryService.findMyHistory(userId);
   }
 }

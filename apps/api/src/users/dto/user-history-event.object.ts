@@ -20,3 +20,15 @@ export class UserHistoryEventObject {
   @Field(() => String)
   actorName: string;
 }
+
+@ObjectType()
+export class MyUserHistoryEventObject {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => UserHistoryEventType)
+  type: UserHistoryEventType;
+
+  @Field(() => Date)
+  createdAt: Date;
+}
