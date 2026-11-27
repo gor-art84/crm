@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import type { UserHistoryEventType } from "@/generated/graphql";
 import { GET_USER_HISTORY } from "@/shared/api/graphql/users";
 
-const EVENT_LABELS: Record<UserHistoryEventType, string> = {
+export const EVENT_LABELS: Record<UserHistoryEventType, string> = {
   ACTIVATED: "Доступ включен",
   DEACTIVATED: "Доступ отключен",
   ARCHIVED: "Пользователь архивирован",

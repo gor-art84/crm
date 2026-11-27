@@ -28,6 +28,7 @@ type Documents = {
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": typeof types.ChangePasswordDocument,
     "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n": typeof types.DeleteMyAvatarDocument,
     "\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n": typeof types.RevokeOtherSessionsDocument,
+    "\n  query MyUserHistory {\n    myUserHistory {\n      id\n      createdAt\n      type\n    }\n  }\n": typeof types.MyUserHistoryDocument,
     "\n  query MySessions {\n      mySessions {\n      id\n      isCurrent\n      issuedAt\n      browser\n      os\n      deviceType\n      }\n  }\n": typeof types.MySessionsDocument,
     "\n  mutation RevokeSession($id: ID!) {\n      revokeSession(id: $id)\n  }\n": typeof types.RevokeSessionDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n": typeof types.GetUsersDocument,
@@ -54,6 +55,7 @@ const documents: Documents = {
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input)\n  }\n": types.ChangePasswordDocument,
     "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {\n      id\n      avatarUrl\n    }\n  }\n": types.DeleteMyAvatarDocument,
     "\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n": types.RevokeOtherSessionsDocument,
+    "\n  query MyUserHistory {\n    myUserHistory {\n      id\n      createdAt\n      type\n    }\n  }\n": types.MyUserHistoryDocument,
     "\n  query MySessions {\n      mySessions {\n      id\n      isCurrent\n      issuedAt\n      browser\n      os\n      deviceType\n      }\n  }\n": types.MySessionsDocument,
     "\n  mutation RevokeSession($id: ID!) {\n      revokeSession(id: $id)\n  }\n": types.RevokeSessionDocument,
     "\n  query GetUsers {\n    users {\n      id\n      email\n      firstName\n      middleName\n      lastName\n      phone\n      avatarUrl\n      role\n      birthDate\n      jobTitle\n      telegram\n      whatsapp\n      maxAccount\n      isActive\n        archivedAt\n      inviteStatus\n    }\n  }\n": types.GetUsersDocument,
@@ -136,6 +138,10 @@ export function gql(source: "\n  mutation DeleteMyAvatar {\n    deleteMyAvatar {
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n"): (typeof documents)["\n  mutation RevokeOtherSessions {\n    revokeOtherSessions\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query MyUserHistory {\n    myUserHistory {\n      id\n      createdAt\n      type\n    }\n  }\n"): (typeof documents)["\n  query MyUserHistory {\n    myUserHistory {\n      id\n      createdAt\n      type\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
